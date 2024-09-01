@@ -12,7 +12,7 @@ library(tidyverse)
 We'll want to start with 2023 match data, which is located in [this GitHub repository](https://github.com/dwillis/NCAAWomensSoccerData). We can load the match data directly from GitHub using `read_csv`:
 
 ```{r}
-data <- read_csv("https://raw.githubusercontent.com/dwillis/NCAAWomensSoccerData/main/data/ncaa_womens_soccer_matchstats_2024.csv")
+read_csv("C:/Users/benst/Downloads/ncaa_womens_soccer_matchstats_2024.csv")
 ```
 
 Let's take a look at this data to see what it contains, using `head` and `glimpse`:
@@ -26,7 +26,7 @@ Now, onto the questions using aggregates, which means `group_by` and `summarize`
 
 1.  How many shots in total has Maryland attempted and how many have been on goal? Calculate a percentage of shots on goal.
 
-48.9 % of shots on goal. 22 on goal out of 45. This isn't an awful percentage at all. However, it makes you wonder how many shots are coming from a greater distance.
+48.9 % of shots on goal. 22 on goal out of 45
 
 ```{r}
 library(readr)
@@ -54,10 +54,6 @@ matches_2024 |>
 
 2.  What about the same shot stats from last season's first four games? You'll need to load the matches from 2023 - just change the season in the URL - and filter by date to find the first four games.
 
-24 shots on goal for Maryland out of 42 shots. Through the first 4 games in 2023, Maryland shot 57% of its shots on goal. Compared to 2024, the team was slightly better in 2023 at putting shots on net through 4 games.
-
-
-
 ```{r}
 library(readr)
 
@@ -65,16 +61,6 @@ library(readr)
 
 data <- read_csv("https://raw.githubusercontent.com/dwillis/NCAAWomensSoccerData/main/data/ncaa_womens_soccer_matchstats_2023.csv")
 
-matches_2023 |>
-
- filter(date %in% c("2023-08-17", "2023-08-20", "2023-08-24", "2023-08-27")) |>
-group_by(team, sh_att, so_g)|>
-
-  summarise(
-    totalshots = sum(sh_att),
-    shotongoal = sum (so_g),
-    percentongoal = (shotongoal/totalshots)
-  )
 
 
 
@@ -82,29 +68,10 @@ group_by(team, sh_att, so_g)|>
 
 3.  What about draws - Maryland started 2022 with 4 ties. Have any other teams had as many this season?
 
-No, but a few teams had 3, including Wagner,UC Santa Barbara, Tarleton State, Lousiana Tech, Hofstra and Campbell
-
 ```{r}
-matches_2024 |>
-  group_by(team, outcome)|>
-  summarise(
-    total = n()
-  ) |>
-  arrange(desc(outcome))
-  
 ```
 
 4.  How many total corner kicks has Maryland had so far and how many have its opponents have? Calculate the difference between the two totals for every team.
 
-Maryland took 18 corners while opponents took 23, which is a -5 corner differential.
-
 ```{r}
-matches_2024 |>
-group_by(team) |>
-summarise(
-corners = sum(corners),
-defensive_corners = sum (defensive_corners),
-corner_difference = (corners-defensive_corners)
-)
 ```
-Overall, I noticed many teams had multiple draws so far to start the year. This is likely because of the new rules implemented a year ago, which got rid of overtime in the regular season. Additionally, over half Maryland's shots were not on goal, which means its scoring chances likely were not very realistic scoring chances. I also found out that the first 4 games of last season saw similar trends, with Maryland shooting a bit over 50% of its shots on goal. Teams that did not have a lpot of shots on goal were the ones more likely to tie or lose the game, which is pretty obvious you'd think but sometimes there are exceptions.
