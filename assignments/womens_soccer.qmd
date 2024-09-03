@@ -105,6 +105,23 @@ summarise(
 corners = sum(corners),
 defensive_corners = sum (defensive_corners),
 corner_difference = (corners-defensive_corners)
-)
+
+
 ```
+
+
+```{r}
+matches_2024 <- matches_2024 |>
+  mutate(corner_ratio = corners/defensive_corners)
+
+matches_2024 |>
+filter(corner_ratio >= 4.0) |>
+  group_by(outcome) |>
+summarise(count = n())
+  
+
+```
+
+
+```{r}
 Overall, I noticed many teams had multiple draws so far to start the year. This is likely because of the new rules implemented a year ago, which got rid of overtime in the regular season. Additionally, over half Maryland's shots were not on goal, which means its scoring chances likely were not very realistic scoring chances. I also found out that the first 4 games of last season saw similar trends, with Maryland shooting a bit over 50% of its shots on goal. Teams that did not have a lpot of shots on goal were the ones more likely to tie or lose the game, which is pretty obvious you'd think but sometimes there are exceptions.
