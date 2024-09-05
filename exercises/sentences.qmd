@@ -1,0 +1,30 @@
+```{r}
+```
+
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+soccer <- read_csv("https://dwillis.github.io/sports-data-files/ncaa_womens_soccer_totals_2023.csv")
+```
+
+
+```{r}
+soccer |>
+  mutate(SoGPct = (SoG/ShAtt)*100
+) |>
+  arrange(desc(SoGPct))
+```
+
+```{r}
+# analysis
+```
+
+Paragraphs:
+
+It's obvious in soccer. Teams have to put shots on goal to score, right? Well, sometimes it's not so simple. Prairie View is an anomaly in this realm. Prairie View has only scored 11 goals on the season despite putting nearly 70% of its shots on goal.
+
+In 2023, other teams that shot over 60% of its shots on goal scored much more. What's even crazier? 7 of the top 10 teams for Shot on goal percentage play in the SWAC. Moreover, Delaware State displayed abysmal offensive numbers despite putting nearly 60% on goal. It only scored 2 goals, giving up 54. Shots on goal are important, but they don't give the audience a clear baseline of how often a team should score.  
+
