@@ -33,7 +33,7 @@ library(readr)
 
 
 
-data <- read_csv("https://raw.githubusercontent.com/dwillis/NCAAWomensSoccerData/main/data/ncaa_womens_soccer_matchstats_2024.csv")
+matches_2024 <- read_csv("https://raw.githubusercontent.com/dwillis/NCAAWomensSoccerData/main/data/ncaa_womens_soccer_matchstats_2024.csv")
 
 
 head(data)
@@ -63,7 +63,7 @@ library(readr)
 
 
 
-data <- read_csv("https://raw.githubusercontent.com/dwillis/NCAAWomensSoccerData/main/data/ncaa_womens_soccer_matchstats_2023.csv")
+matches_2023 <- read_csv("https://raw.githubusercontent.com/dwillis/NCAAWomensSoccerData/main/data/ncaa_womens_soccer_matchstats_2023.csv")
 
 matches_2023 |>
 
@@ -124,4 +124,33 @@ summarise(count = n())
 
 
 ```{r}
-Overall, I noticed many teams had multiple draws so far to start the year. This is likely because of the new rules implemented a year ago, which got rid of overtime in the regular season. Additionally, over half Maryland's shots were not on goal, which means its scoring chances likely were not very realistic scoring chances. I also found out that the first 4 games of last season saw similar trends, with Maryland shooting a bit over 50% of its shots on goal. Teams that did not have a lpot of shots on goal were the ones more likely to tie or lose the game, which is pretty obvious you'd think but sometimes there are exceptions.
+matches_2024 <- read_csv("https://raw.githubusercontent.com/dwillis/NCAAWomensSoccerData/main/data/ncaa_womens_soccer_matchstats_2024.csv")
+
+goals_24 <- matches_2024 |> mutate(total_goals = goals + defensive_goals)
+
+
+matches_2023 <- read_csv("https://raw.githubusercontent.com/dwillis/NCAAWomensSoccerData/main/data/ncaa_womens_soccer_matchstats_2023.csv")
+
+goals_23 <- matches_2023 |>
+  mutate(total_goals = goals + defensive_goals)
+
+
+goals_23_umd <- goals_23 |> filter(team == 'Maryland Terrapins, Terps') |> mutate(season=2023) |> filter(date < '2023-09-12')
+
+goals_24_umd <- goals_24 |> filter (team == 'Maryland Terrapins, Terps') |> mutate(season=2024)
+
+
+result <- t.test(goals_23_umd$goals, goals_24_umd$goals, alternative="two.sided", var.equal = TRUE)
+
+print(result)
+
+
+print(result)
+
+```
+The P-Value is above 0.5 which means there is no statistical significance and the data is much higher at this point. For whole season 2023 the mean of x was .500 so about half a goal. After filtering the date it goes up to 1.125. 
+
+```{r}
+
+
+
