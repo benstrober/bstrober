@@ -129,10 +129,15 @@ matches_2024 <- read_csv("https://raw.githubusercontent.com/dwillis/NCAAWomensSo
 goals_24 <- matches_2024 |> mutate(total_goals = goals + defensive_goals)
 
 
+
 matches_2023 <- read_csv("https://raw.githubusercontent.com/dwillis/NCAAWomensSoccerData/main/data/ncaa_womens_soccer_matchstats_2023.csv")
 
 goals_23 <- matches_2023 |>
-  mutate(total_goals = goals + defensive_goals)
+  mutate(total_goals = goals + defensive_goals) |> filter(date < '2023-09-12')
+
+result <- t.test(goals_23$goals, goals_24$goals, alternative="two.sided", var.equal = TRUE)
+
+print(result)
 
 
 goals_23_umd <- goals_23 |> filter(team == 'Maryland Terrapins, Terps') |> mutate(season=2023) |> filter(date < '2023-09-12')
@@ -148,7 +153,12 @@ print(result)
 print(result)
 
 ```
-The P-Value is above 0.5 which means there is no statistical significance and the data is much higher at this point. For whole season 2023 the mean of x was .500 so about half a goal. After filtering the date it goes up to 1.125. 
+For total scoring: the high p-value indicates there isn't any significance regarding scoring being up this year. This was discovered after filtering the 2023 data to reflect games before 9-12 just like we did for volleyball.
+
+
+
+
+The P-Value is above 0.5 which means there is no statistical significance and the data is much higher at this point. For whole season 2023 the mean of x was .500 so about half a goal. After filtering the date it goes up to 1.125. THIS IS FOR MARYLAND DATA
 
 ```{r}
 
