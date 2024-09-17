@@ -160,7 +160,53 @@ For total scoring: the high p-value indicates there isn't any significance regar
 
 The P-Value is above 0.5 which means there is no statistical significance and the data is much higher at this point. For whole season 2023 the mean of x was .500 so about half a goal. After filtering the date it goes up to 1.125. THIS IS FOR MARYLAND DATA
 
+
+### Correlations
+
 ```{r}
+correlations <- read_csv("https://raw.githubusercontent.com/dwillis/NCAAWomensSoccerData/main/data/ncaa_womens_soccer_matchstats_2024.csv")
+```
+```{r}
+newcorrelations <- correlations |> 
+  mutate(
+    differential = goals - defensive_goals
+    )
+
+
+```
+
+
+```{r}
+newcorrelations |> summarise(correlation = cor(differential, fouls, method="pearson"))
+```
+This means that fouls and goal differential are about 2% related, meaning basically nothing.
+
+```{r}
+newcorrelations |> summarise(correlation = cor(differential, yellow_cards, method="pearson"))
+```
+
+
+This is about 91% unrelated but it's slightly negative, so yeah, yellow cards probably do help the other team a little bit.
+
+```{r}
+fit <- lm(differential ~ fouls, data = newcorrelations)
+summary(fit)
+```
 
 
 
+```{r}
+newcorrelations |> 
+  summarise(correlation = cor(differential, so_g, method="pearson"))
+```
+```{r}
+net <- lm(differential ~ so_g, data = newcorrelations)
+summary(net)
+```
+
+
+```{r}
+(0.44111*9)+-2.48075 
+```
+
+Maryland Women's soccer has had a mediocre start to the season. But why? Using our model that we've built explains that the amount of fouls do not determine the winner or loser in games. Shots on goals are most important. Shots on goals have direct impact on outcomes and goal differential overall in women's college soccer. However, Maryland is an interesting exception in this case. Using this model we can find the real reason the team is struggling. Using the model we can use data from previous years to compare and contrast data. The model reveals how any statistic either effects or does not effect outcomes. The model allows for us to compare game-by-game data, which can reveal impact of certain performances and how they compare to overall data in the season, also compared to the sport as a whole. For example, our model reveals the differential in goals sometimes should be different than the actual scored based on data. For example, Maryland's loss to George Mason on Sep 1 actually should have been at least a one-goal win for Maryland based on our model. Data matters, and our model can reveal what the most important factors in team results are.

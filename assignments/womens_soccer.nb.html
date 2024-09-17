@@ -1760,6 +1760,18 @@ questions</a>. First, let’s load the tidyverse library:</p>
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeSh0aWR5dmVyc2UpXG5gYGAifQ== -->
 <pre class="r"><code>library(tidyverse)</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoi4pSA4pSAIEF0dGFjaGluZyBjb3JlIHRpZHl2ZXJzZSBwYWNrYWdlcyDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAgdGlkeXZlcnNlIDIuMC4wIOKUgOKUgFxu4pyUIGRwbHlyICAgICAxLjEuNCAgICAg4pyUIHJlYWRyICAgICAyLjEuNVxu4pyUIGZvcmNhdHMgICAxLjAuMCAgICAg4pyUIHN0cmluZ3IgICAxLjUuMVxu4pyUIGdncGxvdDIgICAzLjUuMSAgICAg4pyUIHRpYmJsZSAgICAzLjIuMVxu4pyUIGx1YnJpZGF0ZSAxLjkuMyAgICAg4pyUIHRpZHlyICAgICAxLjMuMVxu4pyUIHB1cnJyICAgICAxLjAuMiAgICAgXG7ilIDilIAgQ29uZmxpY3RzIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgCB0aWR5dmVyc2VfY29uZmxpY3RzKCkg4pSA4pSAXG7inJYgZHBseXI6OmZpbHRlcigpIG1hc2tzIHN0YXRzOjpmaWx0ZXIoKVxu4pyWIGRwbHlyOjpsYWcoKSAgICBtYXNrcyBzdGF0czo6bGFnKClcbuKEuSBVc2UgdGhlIFx1MDAxYl04OztodHRwOi8vY29uZmxpY3RlZC5yLWxpYi5vcmcvXHUwMDA3Y29uZmxpY3RlZCBwYWNrYWdlXHUwMDFiXTg7O1x1MDAwNyB0byBmb3JjZSBhbGwgY29uZmxpY3RzIHRvIGJlY29tZSBlcnJvcnNcbiJ9 -->
+<pre><code>── Attaching core tidyverse packages ─────────────────────────────────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.5
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ ggplot2   3.5.1     ✔ tibble    3.2.1
+✔ lubridate 1.9.3     ✔ tidyr     1.3.1
+✔ purrr     1.0.2     
+── Conflicts ───────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the ]8;;http://conflicted.r-lib.org/conflicted package]8;; to force all conflicts to become errors</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>We’ll want to start with 2023 match data, which is located in <a href="https://github.com/dwillis/NCAAWomensSoccerData">this GitHub
@@ -2144,11 +2156,165 @@ did for volleyball.</p>
 significance and the data is much higher at this point. For whole season
 2023 the mean of x was .500 so about half a goal. After filtering the
 date it goes up to 1.125. THIS IS FOR MARYLAND DATA</p>
+<div id="correlations" class="section level3">
+<h3>Correlations</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-chunk-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29ycmVsYXRpb25zIDwtIHJlYWRfY3N2KFwiaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2R3aWxsaXMvTkNBQVdvbWVuc1NvY2NlckRhdGEvbWFpbi9kYXRhL25jYWFfd29tZW5zX3NvY2Nlcl9tYXRjaHN0YXRzXzIwMjQuY3N2XCIpXG5gYGAifQ== -->
+<pre class="r"><code>correlations &lt;- read_csv(&quot;https://raw.githubusercontent.com/dwillis/NCAAWomensSoccerData/main/data/ncaa_womens_soccer_matchstats_2024.csv&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiUm93czogMjY0NCBDb2x1bW5zOiAzNlxu4pSA4pSAIENvbHVtbiBzcGVjaWZpY2F0aW9uIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgFxuRGVsaW1pdGVyOiBcIixcIlxuY2hyICAgKDYpOiB0ZWFtLCBvcHBvbmVudCwgaG9tZV9hd2F5LCBvdXRjb21lLCBtaW51dGVzLCBkZWZlbnNpdmVfbWludXRlc1xuZGJsICAoMjkpOiB0ZWFtX3Njb3JlLCBvcHBvbmVudF9zY29yZSwgb3ZlcnRpbWUsIGdwLCBnb2FscywgYXNzaXN0cywgcG9pbnRzLCBzaF9hdHQsIHNvX2csIGZvdWxzLCByZWRfYy4uLlxuZGF0ZSAgKDEpOiBkYXRlXG5cbuKEuSBVc2UgYHNwZWMoKWAgdG8gcmV0cmlldmUgdGhlIGZ1bGwgY29sdW1uIHNwZWNpZmljYXRpb24gZm9yIHRoaXMgZGF0YS5cbuKEuSBTcGVjaWZ5IHRoZSBjb2x1bW4gdHlwZXMgb3Igc2V0IGBzaG93X2NvbF90eXBlcyA9IEZBTFNFYCB0byBxdWlldCB0aGlzIG1lc3NhZ2UuXG4ifQ== -->
+<pre><code>Rows: 2644 Columns: 36
+── Column specification ───────────────────────────────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+chr   (6): team, opponent, home_away, outcome, minutes, defensive_minutes
+dbl  (29): team_score, opponent_score, overtime, gp, goals, assists, points, sh_att, so_g, fouls, red_c...
+date  (1): date
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIldvbWVuJ3MgU29jY2VyIERhdGEiDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQpXZSdsbCB1c2UgdGhpcyBub3RlYm9vayB0byBleHBsb3JlIHNvbWUgTkNBQSB3b21lbidzIHNvY2NlciBkYXRhIGFuZCBbb3VyIHF1ZXN0aW9uc10oaHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvMWtUU3JubDFVUm1jZXhJV0xETVdxRG5wM3EtYzJPUzQ1dWlmbmhqcDEwbjQvZWRpdCNnaWQ9MCkuIEZpcnN0LCBsZXQncyBsb2FkIHRoZSB0aWR5dmVyc2UgbGlicmFyeToNCg0KYGBge3J9DQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmBgYA0KDQpXZSdsbCB3YW50IHRvIHN0YXJ0IHdpdGggMjAyMyBtYXRjaCBkYXRhLCB3aGljaCBpcyBsb2NhdGVkIGluIFt0aGlzIEdpdEh1YiByZXBvc2l0b3J5XShodHRwczovL2dpdGh1Yi5jb20vZHdpbGxpcy9OQ0FBV29tZW5zU29jY2VyRGF0YSkuIFdlIGNhbiBsb2FkIHRoZSBtYXRjaCBkYXRhIGRpcmVjdGx5IGZyb20gR2l0SHViIHVzaW5nIGByZWFkX2NzdmA6DQoNCmBgYHtyfQ0KZGF0YSA8LSByZWFkX2NzdigiaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2R3aWxsaXMvTkNBQVdvbWVuc1NvY2NlckRhdGEvbWFpbi9kYXRhL25jYWFfd29tZW5zX3NvY2Nlcl9tYXRjaHN0YXRzXzIwMjQuY3N2IikNCmBgYA0KDQpMZXQncyB0YWtlIGEgbG9vayBhdCB0aGlzIGRhdGEgdG8gc2VlIHdoYXQgaXQgY29udGFpbnMsIHVzaW5nIGBoZWFkYCBhbmQgYGdsaW1wc2VgOg0KDQpgYGB7cn0NCmhlYWQobWF0Y2hlc18yMDI0KQ0KZ2xpbXBzZShtYXRjaGVzXzIwMjQpDQpgYGANCg0KTm93LCBvbnRvIHRoZSBxdWVzdGlvbnMgdXNpbmcgYWdncmVnYXRlcywgd2hpY2ggbWVhbnMgYGdyb3VwX2J5YCBhbmQgYHN1bW1hcml6ZWA6DQoNCjEuICBIb3cgbWFueSBzaG90cyBpbiB0b3RhbCBoYXMgTWFyeWxhbmQgYXR0ZW1wdGVkIGFuZCBob3cgbWFueSBoYXZlIGJlZW4gb24gZ29hbD8gQ2FsY3VsYXRlIGEgcGVyY2VudGFnZSBvZiBzaG90cyBvbiBnb2FsLg0KDQo0OC45ICUgb2Ygc2hvdHMgb24gZ29hbC4gMjIgb24gZ29hbCBvdXQgb2YgNDUuIFRoaXMgaXNuJ3QgYW4gYXdmdWwgcGVyY2VudGFnZSBhdCBhbGwuIEhvd2V2ZXIsIGl0IG1ha2VzIHlvdSB3b25kZXIgaG93IG1hbnkgc2hvdHMgYXJlIGNvbWluZyBmcm9tIGEgZ3JlYXRlciBkaXN0YW5jZS4NCg0KYGBge3J9DQpsaWJyYXJ5KHJlYWRyKQ0KDQoNCg0KbWF0Y2hlc18yMDI0IDwtIHJlYWRfY3N2KCJodHRwczovL3Jhdy5naXRodWJ1c2VyY29udGVudC5jb20vZHdpbGxpcy9OQ0FBV29tZW5zU29jY2VyRGF0YS9tYWluL2RhdGEvbmNhYV93b21lbnNfc29jY2VyX21hdGNoc3RhdHNfMjAyNC5jc3YiKQ0KDQoNCmhlYWQoZGF0YSkNCg0KDQptYXRjaGVzXzIwMjQgfD4NCiAgZ3JvdXBfYnkodGVhbSwgc2hfYXR0LCBzb19nKSB8Pg0KICBzdW1tYXJpc2UoDQogICAgdG90YWxzaG90cyA9IHN1bShzaF9hdHQpLA0KICAgIHNob3RvbmdvYWwgPSBzdW0gKHNvX2cpLA0KICAgIHBlcmNlbnRvbmdvYWwgPSAoc2hvdG9uZ29hbC90b3RhbHNob3RzKQ0KICApDQogIA0KDQoNCg0KYGBgDQoNCjIuICBXaGF0IGFib3V0IHRoZSBzYW1lIHNob3Qgc3RhdHMgZnJvbSBsYXN0IHNlYXNvbidzIGZpcnN0IGZvdXIgZ2FtZXM/IFlvdSdsbCBuZWVkIHRvIGxvYWQgdGhlIG1hdGNoZXMgZnJvbSAyMDIzIC0ganVzdCBjaGFuZ2UgdGhlIHNlYXNvbiBpbiB0aGUgVVJMIC0gYW5kIGZpbHRlciBieSBkYXRlIHRvIGZpbmQgdGhlIGZpcnN0IGZvdXIgZ2FtZXMuDQoNCjI0IHNob3RzIG9uIGdvYWwgZm9yIE1hcnlsYW5kIG91dCBvZiA0MiBzaG90cy4gVGhyb3VnaCB0aGUgZmlyc3QgNCBnYW1lcyBpbiAyMDIzLCBNYXJ5bGFuZCBzaG90IDU3JSBvZiBpdHMgc2hvdHMgb24gZ29hbC4gQ29tcGFyZWQgdG8gMjAyNCwgdGhlIHRlYW0gd2FzIHNsaWdodGx5IGJldHRlciBpbiAyMDIzIGF0IHB1dHRpbmcgc2hvdHMgb24gbmV0IHRocm91Z2ggNCBnYW1lcy4NCg0KDQoNCmBgYHtyfQ0KbGlicmFyeShyZWFkcikNCg0KDQoNCm1hdGNoZXNfMjAyMyA8LSByZWFkX2NzdigiaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2R3aWxsaXMvTkNBQVdvbWVuc1NvY2NlckRhdGEvbWFpbi9kYXRhL25jYWFfd29tZW5zX3NvY2Nlcl9tYXRjaHN0YXRzXzIwMjMuY3N2IikNCg0KbWF0Y2hlc18yMDIzIHw+DQoNCiBmaWx0ZXIoZGF0ZSAlaW4lIGMoIjIwMjMtMDgtMTciLCAiMjAyMy0wOC0yMCIsICIyMDIzLTA4LTI0IiwgIjIwMjMtMDgtMjciKSkgfD4NCmdyb3VwX2J5KHRlYW0sIHNoX2F0dCwgc29fZyl8Pg0KDQogIHN1bW1hcmlzZSgNCiAgICB0b3RhbHNob3RzID0gc3VtKHNoX2F0dCksDQogICAgc2hvdG9uZ29hbCA9IHN1bSAoc29fZyksDQogICAgcGVyY2VudG9uZ29hbCA9IChzaG90b25nb2FsL3RvdGFsc2hvdHMpDQogICkNCg0KDQoNCmBgYA0KDQozLiAgV2hhdCBhYm91dCBkcmF3cyAtIE1hcnlsYW5kIHN0YXJ0ZWQgMjAyMiB3aXRoIDQgdGllcy4gSGF2ZSBhbnkgb3RoZXIgdGVhbXMgaGFkIGFzIG1hbnkgdGhpcyBzZWFzb24/DQoNCk5vLCBidXQgYSBmZXcgdGVhbXMgaGFkIDMsIGluY2x1ZGluZyBXYWduZXIsVUMgU2FudGEgQmFyYmFyYSwgVGFybGV0b24gU3RhdGUsIExvdXNpYW5hIFRlY2gsIEhvZnN0cmEgYW5kIENhbXBiZWxsDQoNCmBgYHtyfQ0KbWF0Y2hlc18yMDI0IHw+DQogIGdyb3VwX2J5KHRlYW0sIG91dGNvbWUpfD4NCiAgc3VtbWFyaXNlKA0KICAgIHRvdGFsID0gbigpDQogICkgfD4NCiAgYXJyYW5nZShkZXNjKG91dGNvbWUpKQ0KICANCmBgYA0KDQo0LiAgSG93IG1hbnkgdG90YWwgY29ybmVyIGtpY2tzIGhhcyBNYXJ5bGFuZCBoYWQgc28gZmFyIGFuZCBob3cgbWFueSBoYXZlIGl0cyBvcHBvbmVudHMgaGF2ZT8gQ2FsY3VsYXRlIHRoZSBkaWZmZXJlbmNlIGJldHdlZW4gdGhlIHR3byB0b3RhbHMgZm9yIGV2ZXJ5IHRlYW0uDQoNCk1hcnlsYW5kIHRvb2sgMTggY29ybmVycyB3aGlsZSBvcHBvbmVudHMgdG9vayAyMywgd2hpY2ggaXMgYSAtNSBjb3JuZXIgZGlmZmVyZW50aWFsLg0KDQpgYGB7cn0NCm1hdGNoZXNfMjAyNCB8Pg0KZ3JvdXBfYnkodGVhbSkgfD4NCnN1bW1hcmlzZSgNCmNvcm5lcnMgPSBzdW0oY29ybmVycyksDQpkZWZlbnNpdmVfY29ybmVycyA9IHN1bSAoZGVmZW5zaXZlX2Nvcm5lcnMpLA0KY29ybmVyX2RpZmZlcmVuY2UgPSAoY29ybmVycy1kZWZlbnNpdmVfY29ybmVycykNCg0KDQpgYGANCg0KDQpgYGB7cn0NCm1hdGNoZXNfMjAyNCA8LSBtYXRjaGVzXzIwMjQgfD4NCiAgbXV0YXRlKGNvcm5lcl9yYXRpbyA9IGNvcm5lcnMvZGVmZW5zaXZlX2Nvcm5lcnMpDQoNCm1hdGNoZXNfMjAyNCB8Pg0KZmlsdGVyKGNvcm5lcl9yYXRpbyA+PSA0LjApIHw+DQogIGdyb3VwX2J5KG91dGNvbWUpIHw+DQpzdW1tYXJpc2UoY291bnQgPSBuKCkpDQogIA0KDQpgYGANCg0KDQpgYGB7cn0NCm1hdGNoZXNfMjAyNCA8LSByZWFkX2NzdigiaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2R3aWxsaXMvTkNBQVdvbWVuc1NvY2NlckRhdGEvbWFpbi9kYXRhL25jYWFfd29tZW5zX3NvY2Nlcl9tYXRjaHN0YXRzXzIwMjQuY3N2IikNCg0KZ29hbHNfMjQgPC0gbWF0Y2hlc18yMDI0IHw+IG11dGF0ZSh0b3RhbF9nb2FscyA9IGdvYWxzICsgZGVmZW5zaXZlX2dvYWxzKQ0KDQoNCg0KbWF0Y2hlc18yMDIzIDwtIHJlYWRfY3N2KCJodHRwczovL3Jhdy5naXRodWJ1c2VyY29udGVudC5jb20vZHdpbGxpcy9OQ0FBV29tZW5zU29jY2VyRGF0YS9tYWluL2RhdGEvbmNhYV93b21lbnNfc29jY2VyX21hdGNoc3RhdHNfMjAyMy5jc3YiKQ0KDQpnb2Fsc18yMyA8LSBtYXRjaGVzXzIwMjMgfD4NCiAgbXV0YXRlKHRvdGFsX2dvYWxzID0gZ29hbHMgKyBkZWZlbnNpdmVfZ29hbHMpIHw+IGZpbHRlcihkYXRlIDwgJzIwMjMtMDktMTInKQ0KDQpyZXN1bHQgPC0gdC50ZXN0KGdvYWxzXzIzJGdvYWxzLCBnb2Fsc18yNCRnb2FscywgYWx0ZXJuYXRpdmU9InR3by5zaWRlZCIsIHZhci5lcXVhbCA9IFRSVUUpDQoNCnByaW50KHJlc3VsdCkNCg0KDQpnb2Fsc18yM191bWQgPC0gZ29hbHNfMjMgfD4gZmlsdGVyKHRlYW0gPT0gJ01hcnlsYW5kIFRlcnJhcGlucywgVGVycHMnKSB8PiBtdXRhdGUoc2Vhc29uPTIwMjMpIHw+IGZpbHRlcihkYXRlIDwgJzIwMjMtMDktMTInKQ0KDQpnb2Fsc18yNF91bWQgPC0gZ29hbHNfMjQgfD4gZmlsdGVyICh0ZWFtID09ICdNYXJ5bGFuZCBUZXJyYXBpbnMsIFRlcnBzJykgfD4gbXV0YXRlKHNlYXNvbj0yMDI0KQ0KDQoNCnJlc3VsdCA8LSB0LnRlc3QoZ29hbHNfMjNfdW1kJGdvYWxzLCBnb2Fsc18yNF91bWQkZ29hbHMsIGFsdGVybmF0aXZlPSJ0d28uc2lkZWQiLCB2YXIuZXF1YWwgPSBUUlVFKQ0KDQpwcmludChyZXN1bHQpDQoNCg0KcHJpbnQocmVzdWx0KQ0KDQpgYGANCkZvciB0b3RhbCBzY29yaW5nOiB0aGUgaGlnaCBwLXZhbHVlIGluZGljYXRlcyB0aGVyZSBpc24ndCBhbnkgc2lnbmlmaWNhbmNlIHJlZ2FyZGluZyBzY29yaW5nIGJlaW5nIHVwIHRoaXMgeWVhci4gVGhpcyB3YXMgZGlzY292ZXJlZCBhZnRlciBmaWx0ZXJpbmcgdGhlIDIwMjMgZGF0YSB0byByZWZsZWN0IGdhbWVzIGJlZm9yZSA5LTEyIGp1c3QgbGlrZSB3ZSBkaWQgZm9yIHZvbGxleWJhbGwuDQoNCg0KDQoNClRoZSBQLVZhbHVlIGlzIGFib3ZlIDAuNSB3aGljaCBtZWFucyB0aGVyZSBpcyBubyBzdGF0aXN0aWNhbCBzaWduaWZpY2FuY2UgYW5kIHRoZSBkYXRhIGlzIG11Y2ggaGlnaGVyIGF0IHRoaXMgcG9pbnQuIEZvciB3aG9sZSBzZWFzb24gMjAyMyB0aGUgbWVhbiBvZiB4IHdhcyAuNTAwIHNvIGFib3V0IGhhbGYgYSBnb2FsLiBBZnRlciBmaWx0ZXJpbmcgdGhlIGRhdGUgaXQgZ29lcyB1cCB0byAxLjEyNS4gVEhJUyBJUyBGT1IgTUFSWUxBTkQgREFUQQ0KDQpgYGB7cn0NCg0KDQoNCg==</div>
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubmV3Y29ycmVsYXRpb25zIDwtIGNvcnJlbGF0aW9ucyB8PiBcbiAgbXV0YXRlKFxuICAgIGRpZmZlcmVudGlhbCA9IGdvYWxzIC0gZGVmZW5zaXZlX2dvYWxzXG4gICAgKVxuXG5cbmBgYCJ9 -->
+<pre class="r"><code>newcorrelations &lt;- correlations |&gt; 
+  mutate(
+    differential = goals - defensive_goals
+    )
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubmV3Y29ycmVsYXRpb25zIHw+IHN1bW1hcmlzZShjb3JyZWxhdGlvbiA9IGNvcihkaWZmZXJlbnRpYWwsIGZvdWxzLCBtZXRob2Q9XCJwZWFyc29uXCIpKVxuYGBgIn0= -->
+<pre class="r"><code>newcorrelations |&gt; summarise(correlation = cor(differential, fouls, method=&quot;pearson&quot;))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6MSwibmNvbCI6MSwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyIxIMOXIDEiXX19LCJyZGYiOiJINHNJQUFBQUFBQUFCbDFRUzQ3Q01BeDF2NGdpUHRLc09FUzc2WVlkQ3hBSEdBMFMyOUJtb0NJa1Zab0NDeFp6Q3phY2FzUjVBS2RLSkpSSWpwMFhQL3ZaMzh0Tm5td1NBQWdnREQwSUlnd2hXditzMGhsQTZPUERneEQ2Mmw4dzZhc0RBRWJhejIvL2orbjF2bkFTSTA2T3RNRmc4Z0VPQ2lFbFpVUlZnanY1ZlNuT21lVU0wZncvdkY1NDNNSUZJNDFiT0NtSkl0bXZSRDYrbmc2bEoycmRFVW0rbGg0N1pFODZ3TGpsV2ttWkZ2dVdIOUxjK1E1cXZ0TTl6UmJBQ1BhTWZjUmFoZjh5OU5qUVk4cDNGYWQySEVhMmxObktKVDJaY0lUNzZOYVIxYkxpeXM2SmFKTXBvWWlsSklWZ0Z1a21oK2NiWkc2QWM4OEJBQUE9In0= -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["correlation"],"name":[1],"type":["dbl"],"align":["right"]}],"data":[{"1":"0.02326518"}],"options":{"columns":{"min":{},"max":[10],"total":[1]},"rows":{"min":[10],"max":[10],"total":[1]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>This means that fouls and goal differential are about 2% related,
+meaning basically nothing.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubmV3Y29ycmVsYXRpb25zIHw+IHN1bW1hcmlzZShjb3JyZWxhdGlvbiA9IGNvcihkaWZmZXJlbnRpYWwsIHllbGxvd19jYXJkcywgbWV0aG9kPVwicGVhcnNvblwiKSlcbmBgYCJ9 -->
+<pre class="r"><code>newcorrelations |&gt; summarise(correlation = cor(differential, yellow_cards, method=&quot;pearson&quot;))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6MSwibmNvbCI6MSwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyIxIMOXIDEiXX19LCJyZGYiOiJINHNJQUFBQUFBQUFCbDFRT3c3Q01BeDF2NGdpUGhJVEd4ZG9GeGc0QU9JQUNDVFcwQWFvQ0VtVmhzL0lRVGdISzlmaEZJQlRKUkpLSk1mT2k1Lzk3T1Y4TTBrMkNRQUVFSVllQkJHR0VLMVhpM1FHRVByNDhDQ0V0dlkzVEJvMkFFQlArOWZ6OGg2MUhtTW5NZUxrUkdzTUJuOWdKeGRTVWtaVUtiaVQzNWJpbWxsT0Y4Mi80L1hGNHhiT0dhbmR3a2xCRk1sMkV2bjQramlVbHFoMFJ5VDVXbnJza0QzcEFQMHoxMHFLTkQrYytUR2RPdDlCeGZlNnA5a0NHTUdlc2I5WXEvQy9oaDRiZWt6NXZ1VFVqc1BJbGpKYnVhQVhFL1p3SDgwNnNrcVdYTms1RWEwekpSU3hsQ1FYekNMTjVQRDVBYnVwTXl2UEFRQUEifQ== -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["correlation"],"name":[1],"type":["dbl"],"align":["right"]}],"data":[{"1":"-0.08775187"}],"options":{"columns":{"min":{},"max":[10],"total":[1]},"rows":{"min":[10],"max":[10],"total":[1]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>This is about 91% unrelated but it’s slightly negative, so yeah,
+yellow cards probably do help the other team a little bit.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZml0IDwtIGxtKGRpZmZlcmVudGlhbCB+IGZvdWxzLCBkYXRhID0gbmV3Y29ycmVsYXRpb25zKVxuc3VtbWFyeShmaXQpXG5gYGAifQ== -->
+<pre class="r"><code>fit &lt;- lm(differential ~ fouls, data = newcorrelations)
+summary(fit)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5DYWxsOlxubG0oZm9ybXVsYSA9IGRpZmZlcmVudGlhbCB+IGZvdWxzLCBkYXRhID0gbmV3Y29ycmVsYXRpb25zKVxuXG5SZXNpZHVhbHM6XG4gICAgIE1pbiAgICAgICAxUSAgIE1lZGlhbiAgICAgICAzUSAgICAgIE1heCBcbi0xMC4xMDM4ICAtMS4xNTUyICAtMC4wNjk1ICAgMS4wMTYyICAgOS45OTkxIFxuXG5Db2VmZmljaWVudHM6XG4gICAgICAgICAgICBFc3RpbWF0ZSBTdGQuIEVycm9yIHQgdmFsdWUgUHIoPnx0fClcbihJbnRlcmNlcHQpIC0wLjA2NzYzICAgIDAuMTM3NzIgIC0wLjQ5MSAgICAwLjYyM1xuZm91bHMgICAgICAgIDAuMDE3MTQgICAgMC4wMTQzMyAgIDEuMTk2ICAgIDAuMjMyXG5cblJlc2lkdWFsIHN0YW5kYXJkIGVycm9yOiAyLjU3MiBvbiAyNjQyIGRlZ3JlZXMgb2YgZnJlZWRvbVxuTXVsdGlwbGUgUi1zcXVhcmVkOiAgMC4wMDA1NDEzLFx0QWRqdXN0ZWQgUi1zcXVhcmVkOiAgMC4wMDAxNjMgXG5GLXN0YXRpc3RpYzogMS40MzEgb24gMSBhbmQgMjY0MiBERiwgIHAtdmFsdWU6IDAuMjMxN1xuIn0= -->
+<pre><code>
+Call:
+lm(formula = differential ~ fouls, data = newcorrelations)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-10.1038  -1.1552  -0.0695   1.0162   9.9991 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)
+(Intercept) -0.06763    0.13772  -0.491    0.623
+fouls        0.01714    0.01433   1.196    0.232
+
+Residual standard error: 2.572 on 2642 degrees of freedom
+Multiple R-squared:  0.0005413, Adjusted R-squared:  0.000163 
+F-statistic: 1.431 on 1 and 2642 DF,  p-value: 0.2317</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubmV3Y29ycmVsYXRpb25zIHw+IFxuICBzdW1tYXJpc2UoY29ycmVsYXRpb24gPSBjb3IoZGlmZmVyZW50aWFsLCBzb19nLCBtZXRob2Q9XCJwZWFyc29uXCIpKVxuYGBgIn0= -->
+<pre class="r"><code>newcorrelations |&gt; 
+  summarise(correlation = cor(differential, so_g, method=&quot;pearson&quot;))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6MSwibmNvbCI6MSwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyIxIMOXIDEiXX19LCJyZGYiOiJINHNJQUFBQUFBQUFCbDFRUzQ3Q01BeDF2NGdpUGhMbmFLWFJiR2JIQm5FQUJCTGIwQWFveUNSVkdqNUxsaXdSSitNU1hJQURBRTZWU0ZVaU9YWmUvT3huejZlcjMyU1ZBRUFBWWVoQkVHRUkwWEl4Uy84QVFoOGZIb1RRMWY2TVNlTUdBQmhvUDNsdUh2ZmI5ZVVrUnB6ODB4cURVUXZzNVVKS3lvZ3FCWGZ5dTFLY01zdnBvL2tYdkQ1NDNNSTVJN1ZiT0NtSUl0bEdJaDlmYjRmU0VaWHVpQ1JmUzQ4ZHNpY2RZSGpnV2ttUjVyc0QzNmMvem5kUThhM3VhYllBUnJCbnJCVnJGZjdIMEdORGp5bmZscHphY1JoWlUyWXJGL1Jvd2dIdW8xbEhWc21TS3pzbm9uV21oQ0tXa3VTQ1dhU1pITjVmdXNHeHRNOEJBQUE9In0= -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["correlation"],"name":[1],"type":["dbl"],"align":["right"]}],"data":[{"1":"0.6688006"}],"options":{"columns":{"min":{},"max":[10],"total":[1]},"rows":{"min":[10],"max":[10],"total":[1]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubmV0IDwtIGxtKGRpZmZlcmVudGlhbCB+IHNvX2csIGRhdGEgPSBuZXdjb3JyZWxhdGlvbnMpXG5zdW1tYXJ5KG5ldClcbmBgYCJ9 -->
+<pre class="r"><code>net &lt;- lm(differential ~ so_g, data = newcorrelations)
+summary(net)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5DYWxsOlxubG0oZm9ybXVsYSA9IGRpZmZlcmVudGlhbCB+IHNvX2csIGRhdGEgPSBuZXdjb3JyZWxhdGlvbnMpXG5cblJlc2lkdWFsczpcbiAgICBNaW4gICAgICAxUSAgTWVkaWFuICAgICAgM1EgICAgIE1heCBcbi03Ljk5MTggLTEuMTU5NSAgMC4xNDExICAxLjI3NDEgIDUuMzcyMiBcblxuQ29lZmZpY2llbnRzOlxuICAgICAgICAgICAgIEVzdGltYXRlIFN0ZC4gRXJyb3IgdCB2YWx1ZSBQcig+fHR8KSAgICBcbihJbnRlcmNlcHQpIC0yLjQ0MTc1NiAgIDAuMDY2MTIyICAtMzYuOTMgICA8MmUtMTYgKioqXG5zb19nICAgICAgICAgMC40MzM1MzkgICAwLjAwOTM3NiAgIDQ2LjI0ICAgPDJlLTE2ICoqKlxuLS0tXG5TaWduaWYuIGNvZGVzOiAgMCDigJgqKirigJkgMC4wMDEg4oCYKirigJkgMC4wMSDigJgq4oCZIDAuMDUg4oCYLuKAmSAwLjEg4oCYIOKAmSAxXG5cblJlc2lkdWFsIHN0YW5kYXJkIGVycm9yOiAxLjkxMyBvbiAyNjQyIGRlZ3JlZXMgb2YgZnJlZWRvbVxuTXVsdGlwbGUgUi1zcXVhcmVkOiAgMC40NDczLFx0QWRqdXN0ZWQgUi1zcXVhcmVkOiAgMC40NDcxIFxuRi1zdGF0aXN0aWM6ICAyMTM4IG9uIDEgYW5kIDI2NDIgREYsICBwLXZhbHVlOiA8IDIuMmUtMTZcbiJ9 -->
+<pre><code>
+Call:
+lm(formula = differential ~ so_g, data = newcorrelations)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-7.9918 -1.1595  0.1411  1.2741  5.3722 
+
+Coefficients:
+             Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) -2.441756   0.066122  -36.93   &lt;2e-16 ***
+so_g         0.433539   0.009376   46.24   &lt;2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.913 on 2642 degrees of freedom
+Multiple R-squared:  0.4473,    Adjusted R-squared:  0.4471 
+F-statistic:  2138 on 1 and 2642 DF,  p-value: &lt; 2.2e-16</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuKDAuNDQxMTEqOSkrLTIuNDgwNzUgXG5gYGAifQ== -->
+<pre class="r"><code>(0.44111*9)+-2.48075 </code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDEuNDg5MjRcbiJ9 -->
+<pre><code>[1] 1.48924</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Maryland Women’s soccer has had a mediocre start to the season. But
+why? Using our model that we’ve built explains that the amount of fouls
+do not determine the winner or loser in games. Shots on goals are most
+important. Shots on goals have direct impact on outcomes and goal
+differential overall in women’s college soccer. However, Maryland is an
+interesting exception in this case. Using this model we can find the
+real reason the team is struggling. Using the model we can use data from
+previous years to compare and contrast data. The model reveals how any
+statistic either effects or does not effect outcomes. The model allows
+for us to compare game-by-game data, which can reveal impact of certain
+performances and how they compare to overall data in the season, also
+compared to the sport as a whole. For example, our model reveals the
+differential in goals sometimes should be different than the actual
+scored based on data. For example, Maryland’s loss to George Mason on
+Sep 1 actually should have been at least a one-goal win for Maryland
+based on our model. Data matters, and our model can reveal what the most
+important factors in team results are.</p>
+<!-- rnb-text-end -->
+</div>
+
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIldvbWVuJ3MgU29jY2VyIERhdGEiDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQpXZSdsbCB1c2UgdGhpcyBub3RlYm9vayB0byBleHBsb3JlIHNvbWUgTkNBQSB3b21lbidzIHNvY2NlciBkYXRhIGFuZCBbb3VyIHF1ZXN0aW9uc10oaHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvMWtUU3JubDFVUm1jZXhJV0xETVdxRG5wM3EtYzJPUzQ1dWlmbmhqcDEwbjQvZWRpdCNnaWQ9MCkuIEZpcnN0LCBsZXQncyBsb2FkIHRoZSB0aWR5dmVyc2UgbGlicmFyeToNCg0KYGBge3J9DQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmBgYA0KDQpXZSdsbCB3YW50IHRvIHN0YXJ0IHdpdGggMjAyMyBtYXRjaCBkYXRhLCB3aGljaCBpcyBsb2NhdGVkIGluIFt0aGlzIEdpdEh1YiByZXBvc2l0b3J5XShodHRwczovL2dpdGh1Yi5jb20vZHdpbGxpcy9OQ0FBV29tZW5zU29jY2VyRGF0YSkuIFdlIGNhbiBsb2FkIHRoZSBtYXRjaCBkYXRhIGRpcmVjdGx5IGZyb20gR2l0SHViIHVzaW5nIGByZWFkX2NzdmA6DQoNCmBgYHtyfQ0KZGF0YSA8LSByZWFkX2NzdigiaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2R3aWxsaXMvTkNBQVdvbWVuc1NvY2NlckRhdGEvbWFpbi9kYXRhL25jYWFfd29tZW5zX3NvY2Nlcl9tYXRjaHN0YXRzXzIwMjQuY3N2IikNCmBgYA0KDQpMZXQncyB0YWtlIGEgbG9vayBhdCB0aGlzIGRhdGEgdG8gc2VlIHdoYXQgaXQgY29udGFpbnMsIHVzaW5nIGBoZWFkYCBhbmQgYGdsaW1wc2VgOg0KDQpgYGB7cn0NCmhlYWQobWF0Y2hlc18yMDI0KQ0KZ2xpbXBzZShtYXRjaGVzXzIwMjQpDQpgYGANCg0KTm93LCBvbnRvIHRoZSBxdWVzdGlvbnMgdXNpbmcgYWdncmVnYXRlcywgd2hpY2ggbWVhbnMgYGdyb3VwX2J5YCBhbmQgYHN1bW1hcml6ZWA6DQoNCjEuICBIb3cgbWFueSBzaG90cyBpbiB0b3RhbCBoYXMgTWFyeWxhbmQgYXR0ZW1wdGVkIGFuZCBob3cgbWFueSBoYXZlIGJlZW4gb24gZ29hbD8gQ2FsY3VsYXRlIGEgcGVyY2VudGFnZSBvZiBzaG90cyBvbiBnb2FsLg0KDQo0OC45ICUgb2Ygc2hvdHMgb24gZ29hbC4gMjIgb24gZ29hbCBvdXQgb2YgNDUuIFRoaXMgaXNuJ3QgYW4gYXdmdWwgcGVyY2VudGFnZSBhdCBhbGwuIEhvd2V2ZXIsIGl0IG1ha2VzIHlvdSB3b25kZXIgaG93IG1hbnkgc2hvdHMgYXJlIGNvbWluZyBmcm9tIGEgZ3JlYXRlciBkaXN0YW5jZS4NCg0KYGBge3J9DQpsaWJyYXJ5KHJlYWRyKQ0KDQoNCg0KbWF0Y2hlc18yMDI0IDwtIHJlYWRfY3N2KCJodHRwczovL3Jhdy5naXRodWJ1c2VyY29udGVudC5jb20vZHdpbGxpcy9OQ0FBV29tZW5zU29jY2VyRGF0YS9tYWluL2RhdGEvbmNhYV93b21lbnNfc29jY2VyX21hdGNoc3RhdHNfMjAyNC5jc3YiKQ0KDQoNCmhlYWQoZGF0YSkNCg0KDQptYXRjaGVzXzIwMjQgfD4NCiAgZ3JvdXBfYnkodGVhbSwgc2hfYXR0LCBzb19nKSB8Pg0KICBzdW1tYXJpc2UoDQogICAgdG90YWxzaG90cyA9IHN1bShzaF9hdHQpLA0KICAgIHNob3RvbmdvYWwgPSBzdW0gKHNvX2cpLA0KICAgIHBlcmNlbnRvbmdvYWwgPSAoc2hvdG9uZ29hbC90b3RhbHNob3RzKQ0KICApDQogIA0KDQoNCg0KYGBgDQoNCjIuICBXaGF0IGFib3V0IHRoZSBzYW1lIHNob3Qgc3RhdHMgZnJvbSBsYXN0IHNlYXNvbidzIGZpcnN0IGZvdXIgZ2FtZXM/IFlvdSdsbCBuZWVkIHRvIGxvYWQgdGhlIG1hdGNoZXMgZnJvbSAyMDIzIC0ganVzdCBjaGFuZ2UgdGhlIHNlYXNvbiBpbiB0aGUgVVJMIC0gYW5kIGZpbHRlciBieSBkYXRlIHRvIGZpbmQgdGhlIGZpcnN0IGZvdXIgZ2FtZXMuDQoNCjI0IHNob3RzIG9uIGdvYWwgZm9yIE1hcnlsYW5kIG91dCBvZiA0MiBzaG90cy4gVGhyb3VnaCB0aGUgZmlyc3QgNCBnYW1lcyBpbiAyMDIzLCBNYXJ5bGFuZCBzaG90IDU3JSBvZiBpdHMgc2hvdHMgb24gZ29hbC4gQ29tcGFyZWQgdG8gMjAyNCwgdGhlIHRlYW0gd2FzIHNsaWdodGx5IGJldHRlciBpbiAyMDIzIGF0IHB1dHRpbmcgc2hvdHMgb24gbmV0IHRocm91Z2ggNCBnYW1lcy4NCg0KDQoNCmBgYHtyfQ0KbGlicmFyeShyZWFkcikNCg0KDQoNCm1hdGNoZXNfMjAyMyA8LSByZWFkX2NzdigiaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2R3aWxsaXMvTkNBQVdvbWVuc1NvY2NlckRhdGEvbWFpbi9kYXRhL25jYWFfd29tZW5zX3NvY2Nlcl9tYXRjaHN0YXRzXzIwMjMuY3N2IikNCg0KbWF0Y2hlc18yMDIzIHw+DQoNCiBmaWx0ZXIoZGF0ZSAlaW4lIGMoIjIwMjMtMDgtMTciLCAiMjAyMy0wOC0yMCIsICIyMDIzLTA4LTI0IiwgIjIwMjMtMDgtMjciKSkgfD4NCmdyb3VwX2J5KHRlYW0sIHNoX2F0dCwgc29fZyl8Pg0KDQogIHN1bW1hcmlzZSgNCiAgICB0b3RhbHNob3RzID0gc3VtKHNoX2F0dCksDQogICAgc2hvdG9uZ29hbCA9IHN1bSAoc29fZyksDQogICAgcGVyY2VudG9uZ29hbCA9IChzaG90b25nb2FsL3RvdGFsc2hvdHMpDQogICkNCg0KDQoNCmBgYA0KDQozLiAgV2hhdCBhYm91dCBkcmF3cyAtIE1hcnlsYW5kIHN0YXJ0ZWQgMjAyMiB3aXRoIDQgdGllcy4gSGF2ZSBhbnkgb3RoZXIgdGVhbXMgaGFkIGFzIG1hbnkgdGhpcyBzZWFzb24/DQoNCk5vLCBidXQgYSBmZXcgdGVhbXMgaGFkIDMsIGluY2x1ZGluZyBXYWduZXIsVUMgU2FudGEgQmFyYmFyYSwgVGFybGV0b24gU3RhdGUsIExvdXNpYW5hIFRlY2gsIEhvZnN0cmEgYW5kIENhbXBiZWxsDQoNCmBgYHtyfQ0KbWF0Y2hlc18yMDI0IHw+DQogIGdyb3VwX2J5KHRlYW0sIG91dGNvbWUpfD4NCiAgc3VtbWFyaXNlKA0KICAgIHRvdGFsID0gbigpDQogICkgfD4NCiAgYXJyYW5nZShkZXNjKG91dGNvbWUpKQ0KICANCmBgYA0KDQo0LiAgSG93IG1hbnkgdG90YWwgY29ybmVyIGtpY2tzIGhhcyBNYXJ5bGFuZCBoYWQgc28gZmFyIGFuZCBob3cgbWFueSBoYXZlIGl0cyBvcHBvbmVudHMgaGF2ZT8gQ2FsY3VsYXRlIHRoZSBkaWZmZXJlbmNlIGJldHdlZW4gdGhlIHR3byB0b3RhbHMgZm9yIGV2ZXJ5IHRlYW0uDQoNCk1hcnlsYW5kIHRvb2sgMTggY29ybmVycyB3aGlsZSBvcHBvbmVudHMgdG9vayAyMywgd2hpY2ggaXMgYSAtNSBjb3JuZXIgZGlmZmVyZW50aWFsLg0KDQpgYGB7cn0NCm1hdGNoZXNfMjAyNCB8Pg0KZ3JvdXBfYnkodGVhbSkgfD4NCnN1bW1hcmlzZSgNCmNvcm5lcnMgPSBzdW0oY29ybmVycyksDQpkZWZlbnNpdmVfY29ybmVycyA9IHN1bSAoZGVmZW5zaXZlX2Nvcm5lcnMpLA0KY29ybmVyX2RpZmZlcmVuY2UgPSAoY29ybmVycy1kZWZlbnNpdmVfY29ybmVycykNCg0KDQpgYGANCg0KDQpgYGB7cn0NCm1hdGNoZXNfMjAyNCA8LSBtYXRjaGVzXzIwMjQgfD4NCiAgbXV0YXRlKGNvcm5lcl9yYXRpbyA9IGNvcm5lcnMvZGVmZW5zaXZlX2Nvcm5lcnMpDQoNCm1hdGNoZXNfMjAyNCB8Pg0KZmlsdGVyKGNvcm5lcl9yYXRpbyA+PSA0LjApIHw+DQogIGdyb3VwX2J5KG91dGNvbWUpIHw+DQpzdW1tYXJpc2UoY291bnQgPSBuKCkpDQogIA0KDQpgYGANCg0KDQpgYGB7cn0NCm1hdGNoZXNfMjAyNCA8LSByZWFkX2NzdigiaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2R3aWxsaXMvTkNBQVdvbWVuc1NvY2NlckRhdGEvbWFpbi9kYXRhL25jYWFfd29tZW5zX3NvY2Nlcl9tYXRjaHN0YXRzXzIwMjQuY3N2IikNCg0KZ29hbHNfMjQgPC0gbWF0Y2hlc18yMDI0IHw+IG11dGF0ZSh0b3RhbF9nb2FscyA9IGdvYWxzICsgZGVmZW5zaXZlX2dvYWxzKQ0KDQoNCg0KbWF0Y2hlc18yMDIzIDwtIHJlYWRfY3N2KCJodHRwczovL3Jhdy5naXRodWJ1c2VyY29udGVudC5jb20vZHdpbGxpcy9OQ0FBV29tZW5zU29jY2VyRGF0YS9tYWluL2RhdGEvbmNhYV93b21lbnNfc29jY2VyX21hdGNoc3RhdHNfMjAyMy5jc3YiKQ0KDQpnb2Fsc18yMyA8LSBtYXRjaGVzXzIwMjMgfD4NCiAgbXV0YXRlKHRvdGFsX2dvYWxzID0gZ29hbHMgKyBkZWZlbnNpdmVfZ29hbHMpIHw+IGZpbHRlcihkYXRlIDwgJzIwMjMtMDktMTInKQ0KDQpyZXN1bHQgPC0gdC50ZXN0KGdvYWxzXzIzJGdvYWxzLCBnb2Fsc18yNCRnb2FscywgYWx0ZXJuYXRpdmU9InR3by5zaWRlZCIsIHZhci5lcXVhbCA9IFRSVUUpDQoNCnByaW50KHJlc3VsdCkNCg0KDQpnb2Fsc18yM191bWQgPC0gZ29hbHNfMjMgfD4gZmlsdGVyKHRlYW0gPT0gJ01hcnlsYW5kIFRlcnJhcGlucywgVGVycHMnKSB8PiBtdXRhdGUoc2Vhc29uPTIwMjMpIHw+IGZpbHRlcihkYXRlIDwgJzIwMjMtMDktMTInKQ0KDQpnb2Fsc18yNF91bWQgPC0gZ29hbHNfMjQgfD4gZmlsdGVyICh0ZWFtID09ICdNYXJ5bGFuZCBUZXJyYXBpbnMsIFRlcnBzJykgfD4gbXV0YXRlKHNlYXNvbj0yMDI0KQ0KDQoNCnJlc3VsdCA8LSB0LnRlc3QoZ29hbHNfMjNfdW1kJGdvYWxzLCBnb2Fsc18yNF91bWQkZ29hbHMsIGFsdGVybmF0aXZlPSJ0d28uc2lkZWQiLCB2YXIuZXF1YWwgPSBUUlVFKQ0KDQpwcmludChyZXN1bHQpDQoNCg0KcHJpbnQocmVzdWx0KQ0KDQpgYGANCkZvciB0b3RhbCBzY29yaW5nOiB0aGUgaGlnaCBwLXZhbHVlIGluZGljYXRlcyB0aGVyZSBpc24ndCBhbnkgc2lnbmlmaWNhbmNlIHJlZ2FyZGluZyBzY29yaW5nIGJlaW5nIHVwIHRoaXMgeWVhci4gVGhpcyB3YXMgZGlzY292ZXJlZCBhZnRlciBmaWx0ZXJpbmcgdGhlIDIwMjMgZGF0YSB0byByZWZsZWN0IGdhbWVzIGJlZm9yZSA5LTEyIGp1c3QgbGlrZSB3ZSBkaWQgZm9yIHZvbGxleWJhbGwuDQoNCg0KDQoNClRoZSBQLVZhbHVlIGlzIGFib3ZlIDAuNSB3aGljaCBtZWFucyB0aGVyZSBpcyBubyBzdGF0aXN0aWNhbCBzaWduaWZpY2FuY2UgYW5kIHRoZSBkYXRhIGlzIG11Y2ggaGlnaGVyIGF0IHRoaXMgcG9pbnQuIEZvciB3aG9sZSBzZWFzb24gMjAyMyB0aGUgbWVhbiBvZiB4IHdhcyAuNTAwIHNvIGFib3V0IGhhbGYgYSBnb2FsLiBBZnRlciBmaWx0ZXJpbmcgdGhlIGRhdGUgaXQgZ29lcyB1cCB0byAxLjEyNS4gVEhJUyBJUyBGT1IgTUFSWUxBTkQgREFUQQ0KDQoNCiMjIyBDb3JyZWxhdGlvbnMNCg0KYGBge3J9DQpjb3JyZWxhdGlvbnMgPC0gcmVhZF9jc3YoImh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9kd2lsbGlzL05DQUFXb21lbnNTb2NjZXJEYXRhL21haW4vZGF0YS9uY2FhX3dvbWVuc19zb2NjZXJfbWF0Y2hzdGF0c18yMDI0LmNzdiIpDQpgYGANCmBgYHtyfQ0KbmV3Y29ycmVsYXRpb25zIDwtIGNvcnJlbGF0aW9ucyB8PiANCiAgbXV0YXRlKA0KICAgIGRpZmZlcmVudGlhbCA9IGdvYWxzIC0gZGVmZW5zaXZlX2dvYWxzDQogICAgKQ0KDQoNCmBgYA0KDQoNCmBgYHtyfQ0KbmV3Y29ycmVsYXRpb25zIHw+IHN1bW1hcmlzZShjb3JyZWxhdGlvbiA9IGNvcihkaWZmZXJlbnRpYWwsIGZvdWxzLCBtZXRob2Q9InBlYXJzb24iKSkNCmBgYA0KVGhpcyBtZWFucyB0aGF0IGZvdWxzIGFuZCBnb2FsIGRpZmZlcmVudGlhbCBhcmUgYWJvdXQgMiUgcmVsYXRlZCwgbWVhbmluZyBiYXNpY2FsbHkgbm90aGluZy4NCg0KYGBge3J9DQpuZXdjb3JyZWxhdGlvbnMgfD4gc3VtbWFyaXNlKGNvcnJlbGF0aW9uID0gY29yKGRpZmZlcmVudGlhbCwgeWVsbG93X2NhcmRzLCBtZXRob2Q9InBlYXJzb24iKSkNCmBgYA0KDQoNClRoaXMgaXMgYWJvdXQgOTElIHVucmVsYXRlZCBidXQgaXQncyBzbGlnaHRseSBuZWdhdGl2ZSwgc28geWVhaCwgeWVsbG93IGNhcmRzIHByb2JhYmx5IGRvIGhlbHAgdGhlIG90aGVyIHRlYW0gYSBsaXR0bGUgYml0Lg0KDQpgYGB7cn0NCmZpdCA8LSBsbShkaWZmZXJlbnRpYWwgfiBmb3VscywgZGF0YSA9IG5ld2NvcnJlbGF0aW9ucykNCnN1bW1hcnkoZml0KQ0KYGBgDQoNCg0KDQpgYGB7cn0NCm5ld2NvcnJlbGF0aW9ucyB8PiANCiAgc3VtbWFyaXNlKGNvcnJlbGF0aW9uID0gY29yKGRpZmZlcmVudGlhbCwgc29fZywgbWV0aG9kPSJwZWFyc29uIikpDQpgYGANCmBgYHtyfQ0KbmV0IDwtIGxtKGRpZmZlcmVudGlhbCB+IHNvX2csIGRhdGEgPSBuZXdjb3JyZWxhdGlvbnMpDQpzdW1tYXJ5KG5ldCkNCmBgYA0KDQoNCmBgYHtyfQ0KKDAuNDQxMTEqOSkrLTIuNDgwNzUgDQpgYGANCg0KTWFyeWxhbmQgV29tZW4ncyBzb2NjZXIgaGFzIGhhZCBhIG1lZGlvY3JlIHN0YXJ0IHRvIHRoZSBzZWFzb24uIEJ1dCB3aHk/IFVzaW5nIG91ciBtb2RlbCB0aGF0IHdlJ3ZlIGJ1aWx0IGV4cGxhaW5zIHRoYXQgdGhlIGFtb3VudCBvZiBmb3VscyBkbyBub3QgZGV0ZXJtaW5lIHRoZSB3aW5uZXIgb3IgbG9zZXIgaW4gZ2FtZXMuIFNob3RzIG9uIGdvYWxzIGFyZSBtb3N0IGltcG9ydGFudC4gU2hvdHMgb24gZ29hbHMgaGF2ZSBkaXJlY3QgaW1wYWN0IG9uIG91dGNvbWVzIGFuZCBnb2FsIGRpZmZlcmVudGlhbCBvdmVyYWxsIGluIHdvbWVuJ3MgY29sbGVnZSBzb2NjZXIuIEhvd2V2ZXIsIE1hcnlsYW5kIGlzIGFuIGludGVyZXN0aW5nIGV4Y2VwdGlvbiBpbiB0aGlzIGNhc2UuIFVzaW5nIHRoaXMgbW9kZWwgd2UgY2FuIGZpbmQgdGhlIHJlYWwgcmVhc29uIHRoZSB0ZWFtIGlzIHN0cnVnZ2xpbmcuIFVzaW5nIHRoZSBtb2RlbCB3ZSBjYW4gdXNlIGRhdGEgZnJvbSBwcmV2aW91cyB5ZWFycyB0byBjb21wYXJlIGFuZCBjb250cmFzdCBkYXRhLiBUaGUgbW9kZWwgcmV2ZWFscyBob3cgYW55IHN0YXRpc3RpYyBlaXRoZXIgZWZmZWN0cyBvciBkb2VzIG5vdCBlZmZlY3Qgb3V0Y29tZXMuIFRoZSBtb2RlbCBhbGxvd3MgZm9yIHVzIHRvIGNvbXBhcmUgZ2FtZS1ieS1nYW1lIGRhdGEsIHdoaWNoIGNhbiByZXZlYWwgaW1wYWN0IG9mIGNlcnRhaW4gcGVyZm9ybWFuY2VzIGFuZCBob3cgdGhleSBjb21wYXJlIHRvIG92ZXJhbGwgZGF0YSBpbiB0aGUgc2Vhc29uLCBhbHNvIGNvbXBhcmVkIHRvIHRoZSBzcG9ydCBhcyBhIHdob2xlLiBGb3IgZXhhbXBsZSwgb3VyIG1vZGVsIHJldmVhbHMgdGhlIGRpZmZlcmVudGlhbCBpbiBnb2FscyBzb21ldGltZXMgc2hvdWxkIGJlIGRpZmZlcmVudCB0aGFuIHRoZSBhY3R1YWwgc2NvcmVkIGJhc2VkIG9uIGRhdGEuIEZvciBleGFtcGxlLCBNYXJ5bGFuZCdzIGxvc3MgdG8gR2VvcmdlIE1hc29uIG9uIFNlcCAxIGFjdHVhbGx5IHNob3VsZCBoYXZlIGJlZW4gYXQgbGVhc3QgYSBvbmUtZ29hbCB3aW4gZm9yIE1hcnlsYW5kIGJhc2VkIG9uIG91ciBtb2RlbC4gRGF0YSBtYXR0ZXJzLCBhbmQgb3VyIG1vZGVsIGNhbiByZXZlYWwgd2hhdCB0aGUgbW9zdCBpbXBvcnRhbnQgZmFjdG9ycyBpbiB0ZWFtIHJlc3VsdHMgYXJlLg==</div>
 
 
 
