@@ -1,7 +1,12 @@
 ```{r}
 library(tidyverse)
 library(cfbfastR)
+library(dplyr)
+
 ```
+
+
+  
 
 
 ```{r}
@@ -13,3 +18,53 @@ First-play problems: it appears that teams are inconsistent about how they defin
 ```{r}
 plays_2023 |> filter(drive_number == 1, play_number == 1, play_type != 'Kickoff') |> distinct(home, play_type)
 ```
+
+
+```{r}
+logs <- read.csv("https://dwillis.github.io/sports-data-files/footballlogs1123.csv") 
+```
+
+```{r}
+logs |>
+  mutate(PointDifferential = (TeamScore-OpponentScore))
+```
+```{r}
+correlations <- logs |>
+  mutate(differential = TeamScore - OpponentScore, totalpen = Penalties + DefPenalties)
+
+correlations |> summarise(correlation = cor(differential, totalpen, method="pearson"))
+
+fit <- lm(differential ~ totalpen, data = correlations)
+summary(fit)
+```
+The P-Value we get is 0.805, which means the relationship is not statistically significant.In this case the R-Sqaured reveals penalty yards have almost no connection for the point differential. This model is not very useful given the p value and r squared not indicating significance. 
+
+```{r}
+logs <- logs |> mutate(
+  differential = TeamScore - OpponentScore, 
+  NetPassingPCT = PassingPct - DefPassingPct,
+  TurnoverMargin = TotalTurnovers - DefTotalTurnovers)
+```
+
+```{r}
+PassingPct <- lm(differential ~ NetPassingPCT, data=logs)
+summary(PassingPct)
+```
+
+I attemped to use Net PassingPct to see how these affected the outcome of the game. However, based on the residuals, the margin of error is massive, which is not good for my model. The R-Squared  indicates that about 32.67% of the variance in differential can be explained by NetPassingPCT. While this is not a particularly high value, it suggests that NetPassingPCT does explain a significant correlation. However, I'm probably missing other aspects of my model but I was afraid of multicollinearity. As for the P-Value, that does reveal statistic significance. Overall, the residuals and adjusted R square reveal my model isn't ideal.
+
+```{r}
+
+  close_games <- logs %>% filter(abs(differential) <= 7)
+close_games <- lm(differential ~ NetPassingPCT, data=close_games)
+summary(close_games)
+
+```
+
+Okay, so after experimenting with only games decided by 7 or less, I've concluded that in close games, the model reveals significance due to the P-Value and the R Squared sitting at nearly 60%. Also, I got way less residuals than last time which is a good sign that this factor helped clarify data in these games. PassingPct for both sides of the ball has a pretty large impact on the game, but not anything crazy. Perhaps my model could be better if I included a couple other factors, but I fear the error would be  This regression model was much better than my last.
+
+
+Overall thoughts:
+
+I think the model revealed no strong relationship between penalties and differential. When it was calculated, the P-Value revealed no significance in the data. I don't think there is a story there, but however, if we include penalty data along with other factors, it might reveal a new story. I think it's useful to add context in a larger story because this exercise revealed that differential and penalties didn't have as strong as a correlation as we might think. I think the model I created at the end could be used in journalism because there was strong significance in close games about passing percentage. I'm interested to see how I could have made the model stronger, though.
+
