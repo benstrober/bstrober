@@ -1,0 +1,33 @@
+```{r}
+library(tidyverse)
+library(nflfastR)
+```
+
+## Terry McLaurin Targets by half
+
+* load the play-by-play data
+```{r}
+pbp2022 <- read_rds("https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2022.rds")
+pbp2023 <- read_rds("https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2023.rds")
+pbp2024 <- read_rds("https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2024.rds")
+```
+
+```{r}
+pbp2022 |>
+  filter(posteam =="WAS", play_type =="pass", game_half =="Half1", week <4, receiver =="T.McLaurin")
+```
+
+## 2023
+
+```{r}
+pbp2023 |>
+  filter(posteam =="WAS", play_type =="pass", game_half =="Half1", week <4, receiver =="T.McLaurin")
+```
+
+
+```{r}
+pbp2024 |>
+  filter(posteam =="WAS", play_type =="pass", game_half =="Half1", week <4, receiver =="T.McLaurin")
+```
+
+According to our data, 2024 reveals similar trends early in the season regarding first half targets for Terry. In this case, it's just one more target than 2022 through the first 3 games in the first half. The Giants game he had 4, which isn't awful, but only one against Tampa is crazy. Last night revealed the vertical threat he imposes on a defense. In 2023 he had 12, which is more but not a lot. These media outlets were right to report that Terry has seen a lack of targets early in games. Although the targets we're not a lot last night, the deep ball boosted his yards on one singular catch. Also, it's amazing both of Daniels' incompletions last night were to Terry, including one in the first half.
