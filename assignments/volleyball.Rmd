@@ -119,3 +119,77 @@ teamzscore <- teamtotals |>
 teamzscore |> select(team, TotalZscore, kills_zscore, errors_zscore, s_err_zscore, digs_zscore) |>  arrange(desc(TotalZscore))
 ```
 
+
+
+#### Volleyball Z Score Assignment
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+matches <- read.csv("https://raw.githubusercontent.com/dwillis/NCAAWomensVolleyballData/main/data/ncaa_womens_volleyball_matchstats_2024.csv")
+```
+
+```{r}
+
+teamquality <- matches |> 
+  select(team, kills, s, errors, total_attacks, assists, s_err, digs, ret_att, r_err, b_err, hit_pct, defensive_pts)
+```
+
+
+```{r}
+teamtotals <- teamquality |> 
+  group_by(team) |> 
+  summarise(
+    avg_kills = mean(kills),
+    avg_errors = mean(errors),
+    avg_attacks = mean(total_attacks),
+    avg_assists = mean(assists),
+    avg_s_err = mean(s_err),
+    avg_digs = mean(digs),
+    avg_ret_att = mean(ret_att),
+    avg_r_err = mean(r_err),
+    avg_b_err = mean(b_err),
+    avg_hit_pct = mean (hit_pct),
+    avg_defensive_pts = mean (defensive_pts))
+
+    
+```
+
+
+```{r}
+teamzscore <- teamtotals |> 
+  mutate(
+    kills_zscore = as.numeric(scale(avg_kills, center = TRUE, scale = TRUE)),
+    errors_zscore = as.numeric(scale(avg_errors, center = TRUE, scale = TRUE)) * -1,
+    s_err_zscore = as.numeric(scale(avg_s_err, center = TRUE, scale = TRUE)) * -1,
+    hit_pct_zscore = as.numeric(scale(avg_hit_pct, center = TRUE, scale = TRUE)),
+    defensive_pts_zscore = as.numeric(scale(avg_defensive_pts, center = TRUE, scale = TRUE)),
+    
+    TotalZscore = kills_zscore + errors_zscore + s_err_zscore + hit_pct_zscore + defensive_pts_zscore
+  )
+
+
+```
+### look at the results
+
+```{r}
+teamzscore |> select(team, TotalZscore, kills_zscore, errors_zscore, s_err_zscore, hit_pct_zscore, defensive_pts_zscore) |>  arrange(desc(TotalZscore))
+```
+
+### Answers to Questions
+
+
+In my data, I decided to add hitting pct and defensive points as part of the equation. I thought defensive points made more sense than digs because it attributes physical points. I have found that Kansas is currently the top team in volleyball based on these metrics. And they the only team with a total z score above 5. Kansas is 11-1 and hasn't made many matches close, so this does not surprise me.  Also, another thing we can notice is that a lot of the top teams are positive in every single category. Obviously we would not reference the z-score in a story. However, we can conclude that the teams at the top of the list perform extremely well in all these metrics. All these teams perform above, to well above average at these important stats.
+
+```{r}
+teamzscore %>%
+  filter(team == "Maryland") %>%
+  select(team, TotalZscore, kills_zscore, errors_zscore, s_err_zscore, hit_pct_zscore, defensive_pts_zscore) %>%
+  arrange(desc(TotalZscore))
+```
+
+
+As for Maryland, it has made significant improvements compared to the 2023 season in these metrics. Last year, Maryland was in the negatives for every single category except Hitting pct. This year, the team's hit pct z-score is 1.6, which is evident in the way they've improved in that category this year. When looking through all of the data, we can see Maryland similar in z score to Oregon, San Diego, Notre Dame and Texas Tech. This reveals a major improvement from last season, as Maryland found itself similar to teams such as Lamar, Western Michigan and other teams that are not great volleyball programs. I think a possible story here is that Maryland's higher hitting pct in 2024 has improve it's kill totals. Another story idea is looking at how Maryland's attacking has been a factor. Its  error z score is 1.31, which means they are better than average on the attack. Good hitting pct = good attack. Additionally, a big story here is how the team has created a shift in its identity. One of Maryland's negatives this year is actually its defensive points. Maryland used to be one of the best blocking team in the sport. However, after Rainelle Jones graduated, it appears Adam Hughes has focused a lot on improving the team offensively. The data presented here reveals Maryland has improved quite a bit offensively and taken a step back in terms of defense.
