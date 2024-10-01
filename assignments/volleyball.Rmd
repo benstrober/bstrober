@@ -193,3 +193,15 @@ teamzscore %>%
 
 
 As for Maryland, it has made significant improvements compared to the 2023 season in these metrics. Last year, Maryland was in the negatives for every single category except Hitting pct. This year, the team's hit pct z-score is 1.6, which is evident in the way they've improved in that category this year. When looking through all of the data, we can see Maryland similar in z score to Oregon, San Diego, Notre Dame and Texas Tech. This reveals a major improvement from last season, as Maryland found itself similar to teams such as Lamar, Western Michigan and other teams that are not great volleyball programs. I think a possible story here is that Maryland's higher hitting pct in 2024 has improve it's kill totals. Another story idea is looking at how Maryland's attacking has been a factor. Its  error z score is 1.31, which means they are better than average on the attack. Good hitting pct = good attack. Additionally, a big story here is how the team has created a shift in its identity. One of Maryland's negatives this year is actually its defensive points. Maryland used to be one of the best blocking team in the sport. However, after Rainelle Jones graduated, it appears Adam Hughes has focused a lot on improving the team offensively. The data presented here reveals Maryland has improved quite a bit offensively and taken a step back in terms of defense.
+
+
+### Short Story
+
+
+It was obvious Maryland volleyball wouldn't be the blocking monster it once was without Rainelle Jones. Head coach Adam Hughes knew this, and as a result, he adjusted the team's identity. A team once considered one of the best defensively in the Big Ten, suddenly turned itself into a squad known for its offensive prowess.
+
+Since 2023, Maryland has improved to above average in the majority of offensive categories, most notably, its hitting percentage. Maryland's offensive uptick sees its metrics similar to some notable teams, such as Notre Dame, Oregon and San Diego. 
+
+Last year, Maryland's sub par averages marked similar to tiny mid-major schools not known for volleyball talent. In the Big Ten, that doesn't cut it. In 2024, Maryland's hitting percentage is nearly 60 points higher than the end of last season. 
+
+As a result of better offense, the defense has sightly regressed. Maryland's defensive point metric is below average for NCAA teams, data reveals. As Maryland progresses through Big Ten play, it hopes its improved offense carries it out of an unfortunate 0-2 start.
