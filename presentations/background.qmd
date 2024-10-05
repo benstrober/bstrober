@@ -1,0 +1,9 @@
+```{r}
+library(tidyverse)
+```
+
+```{r}
+Stats <- read_csv("https://raw.githubusercontent.com/dwillis/dwillis.github.io/refs/heads/main/docs/sports-data-files/footballlogs1124.csv")
+```
+
+I decided to study whether or not teams who run more than pass, win more games in college football. I have the necessary data. However, I will need to determine what outliar exist, including teams like Navy who run the option. I'm not sure how yet, but I need to determine an exact thing I'm looking for in these stats. For example, I need a way to determine how much more a team runs than throws to truly consider them in this field. According to TeamRankings.com, 82 teams run 50% or more of its plays. This is good because it means I will have a lot of data to work with. All I need to do is remove outliars such as Army, Navy and Airforce, who all run over 70% of the time.
