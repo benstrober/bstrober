@@ -68,3 +68,40 @@ Overall thoughts:
 
 I think the model revealed no strong relationship between penalties and differential. When it was calculated, the P-Value revealed no significance in the data. I don't think there is a story there, but however, if we include penalty data along with other factors, it might reveal a new story. I think it's useful to add context in a larger story because this exercise revealed that differential and penalties didn't have as strong as a correlation as we might think. I think the model I created at the end could be used in journalism because there was strong significance in close games about passing percentage. I'm interested to see how I could have made the model stronger, though.
 
+```{r}
+library(tidyverse)
+```
+```{r}
+attendance <- read_csv('https://dwillis.github.io/sports-data-files/attendance.csv')
+```
+
+
+```{r}
+top 10 <- attendance |>
+attendance |> 
+  arrange(desc(`2023`)) |> 
+  top_n(10) |> 
+  select(Institution, `2023`)
+```
+
+```{r}
+ggplot() + 
+  geom_bar(
+  data=top10, 
+    aes(x=Institution)
+  )
+```
+
+```{r}
+ggplot() + 
+  geom_bar(
+    data=top10, 
+    aes(x=Institution, weight=`2023`)
+  )
+```
+
+
+```{r}
+```
+
+
