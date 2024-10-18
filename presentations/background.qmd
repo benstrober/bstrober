@@ -113,3 +113,198 @@ ggplot() +
 Here's another example of a challenge presented with the Air Force Academy. Somehow, we need to find a way to distinguish these schools that run the option into their own category. However, New Mexico high percentage I find very interesting. All in all, the Mountain West is really interesting because every team is run heavier. I might explore this conference more.
 
 Overall, I created bar graphs for conferences I found important in this data. I'm looking at how running translates to results, so that will be my next step in the process. However, power conferences such as the SEC and B1G are a lot less run heavy than mid major schools. This provides a challenge for this question because it begs the question; Is it because these mid majors simply lack aerial talent? Is this the standard for the conference? Another challenge is finding true correlation in this data. I will need to use the coordination and z score tools in R to really discover where the correlation resides in this data. I'm excited to explore more, but these charts do provide a good visual representation of the difference between some of these small conferences and the big powerhouses.
+
+
+```{r}
+agg_stats <- running_stats |>
+  group_by(Conference)|>
+  summarize(avg_run_percentage = mean(run_percentage))
+
+```
+
+```{r}
+ggplot() +
+  geom_bar(
+    data = agg_stats,
+    aes(x = reorder(Conference, -avg_run_percentage), 
+        weight = avg_run_percentage))  +
+  labs(title = "Rushing Percentage Over Time by Conference (2011-2024)",
+       x = "Conference",
+       y = "Average Rushing Percentage")+
+        
+  theme_minimal() +
+coord_flip()
+
+```
+Looking at this chart is very interesting because it highlights all the conferences in our data, and not just the 4 I looked at earlier. Every conference is over 50%, so what's interesting about this? Only 2 conferences are over 60%. It's Independent and the Mountain West. I saw that the Mountain West was interesting in my earlier studies, but now we see it on a scale with every other conference, including mid majors. I had wondered if smaller conferences simply ran more than the power conferences, but this chart suggest that maybe the Mountain West is simply different than most conferences. I'm glad this data shows the independents because that includes those schools like Navy, Army and Air force. However, Notre Dame is included, which drives the percentage down. That's important to look at here. 
+
+```{r}
+passing_stats <- Stats |>
+  mutate(pass_percentage = (PassingAtt / (PassingAtt + RushingAtt)) * 100,
+         rush_percentage = (RushingAtt / (PassingAtt + RushingAtt)) * 100)
+```
+
+
+```{r}
+pass_heavy_teams <- passing_stats |>
+  filter(pass_percentage > 50)
+```
+
+Now we have some data about pass heavy teams. There are quiet a lot of household names on here. Let's find a way to view how efficient teams are by conference.
+
+```{r}
+pass_eff <- pass_heavy_teams %>%
+  group_by(Conference, Season) %>%
+  summarize(avg_yards_per_att = mean(yards_per_att, na.rm = TRUE),
+            avg_td_int_ratio = mean(td_int_ratio, na.rm = TRUE),
+            avg_completion_pct = mean(completion_pct, na.rm = TRUE))
+```
+```{r}
+pass_eff_long <- pass_eff |>
+  pivot_longer(cols = c("avg_yards_per_att", "avg_td_int_ratio", "avg_completion_pct"),
+               names_to = "Metric",
+               values_to = "Value")
+print(head(pass_eff_long))
+```
+
+Let's visualize this data to find how efficent each conference was with pass heavy teams.
+
+```{r}
+ggplot(pass_eff_long, aes(x = Season, y = Value, fill = Conference)) +
+  geom_bar(stat = "identity", position = "dodge") +  
+  labs(title = "Offensive Efficiency for Pass-Heavy Teams (2011-2024)",
+       x = "Season",
+       y = "Efficiency Metric",
+       fill = "Conference") +
+  facet_wrap(~ Metric, scales = "free_y") +  
+  theme_minimal() +
+  theme(legend.position = "right")
+```
+As shown, I've tried to visualize the offensive metrics for pass heavy teams. However, the data is too much for the visualization to be easily understandable.Let's try another way.
+```{r}
+agg_eff <- pass_eff_long %>%
+  group_by(Conference, Metric) %>%
+  summarize(avg_value = mean(Value, na.rm = TRUE))
+```
+```{r}
+ggplot(agg_eff, aes(x = reorder(Conference, -avg_value), y = avg_value, fill = Conference)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Average Offensive Efficiency for Pass-Heavy Teams (2011-2024)",
+       x = "Conference",
+       y = "Average Efficiency Metric",
+       fill = "Conference") +
+  facet_wrap(~ Metric, scales = "free_y") +  # Separate by each metric
+  theme_minimal() +
+  theme(legend.position = "none",
+        axis.text.x = element_text(angle = 40, hjust = 1))
+```
+This is really interesting to look at it. According to the charts, The Pac-12 conference has been the best aerial conference since 2011, based on these metrics. The Independent conference is last, which is no surprise because those teams - Notre Dame in this case, don't throw very often. We noticed earlier how the Mountain West ran the ball over 60% of the time as a conference, so to see them on the lower side of these 3 graphs isn't surprising. The SEC and Pac-12, which have seen a lot of success in the passing game over the years, have also seen success period in the win column. You can make a strong argument here that for conferences like those, they rely more on passing because of the talent they possess at those skill positions. One thing I notice interesting here is the Sun Belt Conference. They are top 5 in all these categories. I wonder why. 
+
+Also, how about the Big Ten?? The Big Ten is very low in efficiency in the passing game compared to other conferences.The Big ten runs the ball 56% of the time, which is somewhat higher, but not overwhelming. Are teams like Iowa and Nebraska bringing these numbers way down in the passing game?
+
+
+
+
+```{r}
+Season <- Stats |>
+  
+
+# Assuming your data frame is called Stats and you want to assign specific years
+# You can use case_when to assign the years based on some conditions
+Season <- Stats |>
+ 
+```
+
+
+```{r}
+team_rushing_trends <- Stats |>
+  mutate(Year = year(ymd(Date)),  
+         RushingPct = RushingAtt / (PassingAtt + RushingAtt)) |>  
+  group_by(TeamFull, Year) |>
+  summarise(run_percentage = mean(RushingPct, na.rm = TRUE))
+```
+```{r}
+team_rushing_pivot <- team_rushing_trends |>
+  pivot_wider(names_from = Year, values_from = run_percentage)
+```
+
+```{r}
+str(team_rushing_pivot)
+```
+
+
+```{r}
+library(dplyr)
+
+# Assuming 'team_rushing_pivot' has columns for each year (e.g., 2011, 2012, 2013, etc.)
+# Step 1: Calculate the year-over-year percentage change for each team
+team_rushing_pivot <- team_rushing_pivot %>%
+  mutate(across(starts_with("20"), ~ (. - lag(.)) / lag(.) * 100, .names = "PctChange_{col}"))
+
+# Step 2: Display the results
+head(team_rushing_pivot)
+
+```
+
+
+```{r}
+percentage_change <- team_rushing_trends |>
+  mutate(across(starts_with("20"), ~ (. - lag(.)) / lag(.) * 100, .names = "PctChange_{col}"))
+
+```
+
+
+
+```{r}
+library(dplyr)
+
+
+overall_change <- team_rushing_pivot %>%
+  mutate(across(starts_with("20"), 
+                ~ as.numeric(. - lag(.)) / lag(.) * 100,  
+                .names = "PctChange_{col}"))
+
+
+overall_change <- overall_change %>%
+  mutate(across(starts_with("PctChange_"), ~ replace_na(., 0)))
+
+
+overall_change <- overall_change %>%
+  rowwise() %>%
+  mutate(TotalPctChange = sum(abs(as.numeric(c_across(starts_with("PctChange_")))), na.rm = TRUE)) %>%
+  ungroup()
+
+
+print(head(overall_change))
+
+
+```
+
+```{r}
+top_five <- overall_change |>
+  arrange(desc(TotalPctChange))|>
+  mutate(Top5 = ifelse(row_number() <= 5, "Top 5", "Not Top 5"))
+```
+
+
+```{r}
+top_changers <- top_five %>%
+  filter(Top5 == "Top 5")
+
+
+ggplot(top_changers, aes(x = reorder(TeamFull, -TotalPctChange), y = TotalPctChange)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(title = "Top 5 Teams with Greatest Rushing Percentage Change",
+       x = "Team",
+       y = "Total Percentage Change") +
+  theme_minimal() +
+  coord_flip()  # Flip coordinates for better readability if team names are long
+```
+`
+Not a surprise that Army has seen the greatest percentage change in rushing percentage since 2011. The fact that it's over 800 percent is ridiculous! If we exclude Army and Navy, WVU, Washington State and Akron have seen the greatest increase in rushing percentage since 2011. West Virginia being up this high surprises me. I know they've had some decent QB play over the years with Will Grier, but to see them shape this new identity surprises me. 
+
+As we saw earlier, The Pac-12 has been the best conference when it comes to passing metrics. However, Washington State sneaks its way into the top teams that have run the ball more in this time. I could study more how effective these top teams have been in the win columns compared to some of their peers.
+
+After experimenting with a lot of different things this week, I've made some really good discoveries. The fact that the Big Ten Conference has been one of the worst in terms of passing metrics is shocking to me. Also, discovering WVU and Washington State as teams who have become run-heavy in the past 13 years is good to work with because they come from conferences that have been great statistically passing. 
+
+Next week will require more refining and answering a few more questions with my current data. I can look more at differentials for the best passing teams, and the best running teams. This way, I'll get a more clear understanding of how these run-heavy teams have faired compared to the aerial attackers.
