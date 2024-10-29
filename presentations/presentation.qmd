@@ -1,0 +1,315 @@
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+```
+
+```{r}
+Stats <- read_csv("https://raw.githubusercontent.com/dwillis/dwillis.github.io/refs/heads/main/docs/sports-data-files/footballlogs1124.csv")
+```
+
+In college football, there's always people on both sides of the spectrum. Some believe in running the ball quite often, others do not. 
+
+I wanted to explore if run-heavier teams won more. In the end, I made a completely different and fascinating discovery about the Pac-12 conference. Despite being the most pass-heavy conference in  the nation, 3 teams from the former power conference found themselves in the top 10 for its increased rushing percentage output.
+
+Here's how it happened.
+
+```{r}
+running_stats <- Stats |>
+  group_by(TeamFull, Conference) |>  
+  summarise(total_rushes = sum(RushingAtt, na.rm = TRUE),
+            total_plays = sum(OffensivePlays, na.rm = TRUE),
+            .groups = 'drop') |>  
+  mutate(run_percentage = total_rushes / total_plays * 100) |>
+  filter(run_percentage > 50) |>
+  arrange(desc(run_percentage))  
+
+print(running_stats)
+
+
+
+
+
+```
+
+
+```{r}
+agg_stats <- running_stats |>
+  group_by(Conference)|>
+  summarize(avg_run_percentage = mean(run_percentage))
+
+```
+At this point I had focused a lot on conference to conference data. I studied the SEC, Big Ten and more. One big discovery made was that the Mountain West was pretty run-heavy compared to the other conferences, so I explored this more.
+
+I made sure to not focus on the Independents in my study because it was obvious those teams would run a ridiculous amount. 
+
+```{r}
+ggplot() +
+  geom_bar(
+    data = agg_stats,
+    aes(x = reorder(Conference, -avg_run_percentage), 
+        weight = avg_run_percentage))  +
+  labs(title = "Rushing Percentage Over Time by Conference (2011-2024)",
+       x = "Conference",
+       y = "Average Rushing Percentage")+
+        
+  theme_minimal() +
+coord_flip()
+
+```
+Looking at this chart is very interesting because it highlights all the conferences in our data, and not just the 4 I looked at earlier. Every conference is over 50%, so what's interesting about this? Only 2 conferences are over 60%. It's Independent and the Mountain West. I saw that the Mountain West was interesting in my earlier studies, but now we see it on a scale with every other conference, including mid majors. I had wondered if smaller conferences simply ran more than the power conferences, but this chart suggest that maybe the Mountain West is simply different than most conferences. I'm glad this data shows the independents because that includes those schools like Navy, Army and Air force. However, Notre Dame is included, which drives the percentage down. That's important to look at here. 
+
+At this point I'm not sure where things are going, so I decide to bring passing into the equation.
+
+```{r}
+passing_stats <- Stats |>
+  mutate(pass_percentage = (PassingAtt / (PassingAtt + RushingAtt)) * 100,
+         rush_percentage = (RushingAtt / (PassingAtt + RushingAtt)) * 100)
+```
+
+
+```{r}
+# Calculate yards per attempt, TD/INT ratio, and completion percentage
+pass_heavy_teams <- passing_stats |>
+  filter(pass_percentage > 50) |>
+  mutate(
+    yards_per_att = PassingYds / PassingAtt,  # Calculate yards per attempt
+    td_int_ratio = ifelse(Interceptions == 0, NA, PassingTD / Interceptions),  # Handle division by zero
+    completion_pct = (PassingCmp / PassingAtt) * 100  # Calculate completion percentage
+  )
+
+```
+ 
+ At this point, I had an idea of what teams were pass heavy, and I noticed a lot of household names. It was pretty obvious that really greats team probably threw a lot because of top tier QB play. Once I realized this, I began to focus more on passing metrics overall to see if anything stuck out.
+
+```{r}
+pass_eff <- pass_heavy_teams %>%
+  group_by(Conference, Season) %>%
+  summarize(
+    avg_yards_per_att = mean(yards_per_att, na.rm = TRUE),
+    avg_td_int_ratio = mean(td_int_ratio, na.rm = TRUE),
+    avg_completion_pct = mean(completion_pct, na.rm = TRUE))
+```
+```{r}
+pass_eff_long <- pass_eff |>
+  pivot_longer(cols = c("avg_yards_per_att", "avg_td_int_ratio", "avg_completion_pct"),
+               names_to = "Metric",
+               values_to = "Value")
+print(head(pass_eff_long))
+```
+
+Let's visualize this data to find how efficient each conference was with pass heavy teams.
+
+
+```{r}
+agg_eff <- pass_eff_long %>%
+  group_by(Conference, Metric) %>%
+  summarize(avg_value = mean(Value, na.rm = TRUE))
+```
+```{r}
+ggplot(agg_eff, aes(x = reorder(Conference, -avg_value), y = avg_value, fill = Conference)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Average Offensive Efficiency for Pass-Heavy Teams (2011-2024)",
+       x = "Conference",
+       y = "Average Efficiency Metric",
+       fill = "Conference") +
+  facet_wrap(~ Metric, scales = "free_y") +  # Separate by each metric
+  theme_minimal() +
+  theme(legend.position = "none",
+        axis.text.x = element_text(angle = 40, hjust = 1))
+```
+This was really interesting to look at it. According to the charts, The Pac-12 conference has been the best aerial conference since 2011, based on these metrics. The Independent conference is last, which is no surprise because those teams - Notre Dame in this case, don't throw very often. We noticed earlier how the Mountain West ran the ball over 60% of the time as a conference, so to see them on the lower side of these 3 graphs isn't surprising. The SEC and Pac-12, which have seen a lot of success in the passing game over the years, have also seen success period in the win column. You can make a strong argument here that for conferences like those, they rely more on passing because of the talent they possess at those skill positions. One thing I notice interesting here is the Sun Belt Conference. They are top 5 in all these categories. I wondered why this was the case.
+
+Also, how about the Big Ten?? The Big Ten is very low in efficiency in the passing game compared to other conferences.The Big ten runs the ball 56% of the time, which is somewhat higher, but not overwhelming. Are teams like Iowa and Nebraska bringing these numbers way down in the passing game?
+
+While I was interested in these I ended up shifting my focus because of new discoveries in the data.
+
+
+
+
+
+
+
+```{r}
+team_rushing_trends <- Stats |>
+  mutate(Year = year(ymd(Date)),  
+         RushingPct = RushingAtt / (PassingAtt + RushingAtt)) |>  
+  group_by(TeamFull, Year) |>
+  summarise(run_percentage = mean(RushingPct, na.rm = TRUE))
+```
+```{r}
+team_rushing_pivot <- team_rushing_trends |>
+  pivot_wider(names_from = Year, values_from = run_percentage)
+```
+
+```{r}
+str(team_rushing_pivot)
+```
+
+
+```{r}
+library(dplyr)
+
+# Assuming 'team_rushing_pivot' has columns for each year (e.g., 2011, 2012, 2013, etc.)
+# Step 1: Calculate the year-over-year percentage change for each team
+team_rushing_pivot <- team_rushing_pivot %>%
+  mutate(across(starts_with("20"), ~ (. - lag(.)) / lag(.) * 100, .names = "PctChange_{col}"))
+
+# Step 2: Display the results
+head(team_rushing_pivot)
+
+```
+Here I decided to look at Rushing percentage trends over time. I knew that given the conference data, I could look for certain teams to be around the top.
+
+Once I calculated percentage change, I was shocked by the results.
+
+```{r}
+library(dplyr)
+
+# Step 1: Calculate the year-over-year percentage change for each team
+percentage_change <- team_rushing_trends %>%
+  group_by(TeamFull) %>%  # Group by each team
+  arrange(TeamFull, Year) %>%  # Ensure data is ordered by team and year
+  mutate(PctChange_RushingPct = (run_percentage - lag(run_percentage)) / lag(run_percentage) * 100) %>%
+  ungroup()  # Remove grouping after calculation
+
+# Step 2: Display the results
+print(head(percentage_change))
+
+
+```
+
+
+
+
+```{r}
+library(tidyr)
+
+library(dplyr)
+library(tidyr)
+
+library(tidyr)
+
+team_rushing_wide <- percentage_change %>%
+  select(-run_percentage) %>%  # Remove the 'run_percentage' column
+  pivot_wider(
+    names_from = Year,                  # Use 'Year' as the new column names
+    values_from = PctChange_RushingPct   # The values will come from the year-over-year percentage change
+  ) %>%
+  select(-`2011`) %>%  # Remove the 2011 column as it will be NA
+  mutate(TotalPctChange = rowSums(across(starts_with("20")), na.rm = TRUE))  # Calculate the total percentage change
+
+# Step 2: Print the result with totals
+print(head(team_rushing_wide))
+
+
+
+
+```
+This is where things got interesting. I now had all the schools and their percentage changes since 2011, but let's see what happens when we go for the top ten.
+
+
+```{r}
+top_ten <- team_rushing_wide %>%
+  arrange(desc(TotalPctChange)) %>%
+  head(10)
+```
+
+
+```{r}
+
+# Generate the bar plot
+ggplot(top_ten, aes(x =reorder (TeamFull, TotalPctChange), weight=TotalPctChange)) +
+  geom_bar()+
+  labs(title = "Top 10 Teams with Greatest Rushing Percentage Change since 2011",
+       x = "Team",
+       y = "Total Percentage Change") +
+  theme_minimal() +
+  coord_flip()  # Flip coordinates for better readability
+```
+
+WOW.
+
+Circling back to what we know from earlier, the Pac-12 conference has been the heaviest throwing conference in recent history. With that being said, it's unbelievable the top 2 teams that have run the most in this span actually come from within the conference.
+
+Also, if you look down just a bit, the former Pac-12 Arizona State Sun Devils also crack the top 6. Although the majority of teams in this conference have passed in the past decade. These 3 schools have widely deviated from their peers.
+
+Let's put this into perspective with the rest of the conferences and how rushing trends have changed over time. At the beginning, I had no idea I would end up at this point. When I started looking at conference data, I was discouraged that nothing interesting would arise. 
+
+This stagnation in the Pac-12 is astonishing. 
+
+For Washington State, one incredible stat comes from 2020, probably one the weirdest years in college football ever. The Cougars saw an 84% uptick in rushing that season. How is that even possible?
+
+Of note, In the 13 years of data presented. The Cougars, who saw the greatest percentage change overall, made a bowl game 9 times. That's pretty good.
+
+
+`
+```{r}
+# Calculate average rushing percentage by Conference and Year
+rushing_trends <- Stats |>
+  mutate(Year = year(ymd(Date)),
+         RushingPct = RushingAtt / (PassingAtt + RushingAtt) * 100) |>
+  group_by(Conference, Year) |>
+  summarise(avg_rushing_pct = mean(RushingPct, na.rm = TRUE))
+
+# Calculate overall average rushing percentage across all conferences by year
+average_rushing <- rushing_trends |>
+  group_by(Year) |>
+  summarise(mean_rushing_pct = mean(avg_rushing_pct, na.rm = TRUE))
+
+# Plot the data
+ggplot() + 
+  geom_line(data = rushing_trends, aes(x = Year, y = avg_rushing_pct, group = Conference), color = "grey") +  # Grey background for all conferences
+  geom_line(data = filter(rushing_trends, Conference == "Pac-12 Conference"), aes(x = Year, y = avg_rushing_pct), color = "red") +  # Highlight Pac-12 in red
+  
+  geom_line(data = average_rushing, aes(x = Year, y = mean_rushing_pct), color = "black") +  # Add average rushing percentage in black
+  labs(title = "Pac-12 reveals as one of the lowest rushing conferences",
+       x = "Year",
+       y = "Average Rushing Percentage by Conference") +
+  scale_y_continuous(limits = c(0, 80)) +  # Adjust y-axis limits if needed
+  theme_minimal()
+
+```
+
+When compared to all other conferences, the Pac-12 runs less than most. Despite this fact, and the massive drop off between 2017 and 2020, the top-two teams with the greatest percentage change in rushing percentage in the last 10 years are Washington State and Oregon State.
+
+As indicated with the median average black line, The Pac-12 has never even been average overall in terms of rushing percentage. It's unreal that 3 teams from the conference saw the greatest increase in rushing since 2011.
+
+This is the story. For a conference to be so reluctant to being run-heavy for the most part, Oregon State, Arizona State and Washington State didn't follow the crowd.
+
+
+let's keep exploring this.
+
+```{r}
+# Filter for Pac-12 teams
+pac12_trends <- Stats %>%
+  filter(Conference == "Pac-12 Conference") %>%
+  mutate(Year = year(ymd(Date)),
+         RushingPct = RushingAtt / (PassingAtt + RushingAtt) * 100) %>%
+  group_by(TeamFull, Year) %>%
+  summarise(avg_rushing_pct = mean(RushingPct, na.rm = TRUE))
+
+# Faceted line chart for each team
+ggplot(pac12_trends, aes(x = Year, y = avg_rushing_pct, color = TeamFull)) +
+  geom_line(size = 1) +
+  facet_wrap(~ TeamFull, scales = "free_y") +  # Create a separate plot for each team
+  labs(title = "Rushing Percentage Over Time by Pac-12 Teams",
+       x = "Year", y = "Average Rushing Percentage") +
+   scale_y_continuous(limits = c(15, 80))+
+  theme_minimal() +
+  theme(legend.position = "none")  # Remove the legend as it’s redundant with facets
+
+   
+
+```
+Here's a visual representation of all the now former Pac-12 teams in where they stack up in terms of trends for rushing percentage since 2011. As expected, Washington State and Oregon State feature massive upticks compared to their peers. 
+
+Many of the other schools remained similar in their rushing trends or did not see much change over time. The Pac-12 is the least run-heavy conference so to see such stagnation from Washington State, Oregon State and Arizona State is extremely interesting.
+
+In a project where I wanted to see how running the ball effected wins and losses, I ended up discovering major deviation within the pass heaviest conference. 
+
+The Pac-12 has proven in my presentation to be a dominant conference when it comes to tossing the rock, but 3 teams haven't stuck to the narrative.
+
+Overall, a study focused on running correlating to winning took a wild turn. I think it was pretty obvious to those who watch football that the Pac-12 has always had good QBs and been pass heavy. However, I had no idea that 3 of the teams in the top 10 greatest increases over the 13 year period would be from the same conference.
+
+While I did not find directly how running the ball translates to wins, I have discovered that some teams were bold enough to differ from the norm in their pass heavy conference. That says a lot about the commitments and structures of those programs. When you look at the standings overall, there is evidence of success.
