@@ -146,8 +146,15 @@ passing_stats <- Stats |>
 
 
 ```{r}
+# Calculate yards per attempt, TD/INT ratio, and completion percentage
 pass_heavy_teams <- passing_stats |>
-  filter(pass_percentage > 50)
+  filter(pass_percentage > 50) |>
+  mutate(
+    yards_per_att = PassingYds / PassingAtt,  # Calculate yards per attempt
+    td_int_ratio = ifelse(Interceptions == 0, NA, PassingTD / Interceptions),  # Handle division by zero
+    completion_pct = (PassingCmp / PassingAtt) * 100  # Calculate completion percentage
+  )
+
 ```
 
 Now we have some data about pass heavy teams. There are quiet a lot of household names on here. Let's find a way to view how efficient teams are by conference.
@@ -155,9 +162,10 @@ Now we have some data about pass heavy teams. There are quiet a lot of household
 ```{r}
 pass_eff <- pass_heavy_teams %>%
   group_by(Conference, Season) %>%
-  summarize(avg_yards_per_att = mean(yards_per_att, na.rm = TRUE),
-            avg_td_int_ratio = mean(td_int_ratio, na.rm = TRUE),
-            avg_completion_pct = mean(completion_pct, na.rm = TRUE))
+  summarize(
+    avg_yards_per_att = mean(yards_per_att, na.rm = TRUE),
+    avg_td_int_ratio = mean(td_int_ratio, na.rm = TRUE),
+    avg_completion_pct = mean(completion_pct, na.rm = TRUE))
 ```
 ```{r}
 pass_eff_long <- pass_eff |>
@@ -205,15 +213,8 @@ Also, how about the Big Ten?? The Big Ten is very low in efficiency in the passi
 
 
 
-```{r}
-Season <- Stats |>
-  
 
-# Assuming your data frame is called Stats and you want to assign specific years
-# You can use case_when to assign the years based on some conditions
-Season <- Stats |>
- 
-```
+
 
 
 ```{r}
@@ -259,52 +260,133 @@ percentage_change <- team_rushing_trends |>
 library(dplyr)
 
 
-overall_change <- team_rushing_pivot %>%
-  mutate(across(starts_with("20"), 
-                ~ as.numeric(. - lag(.)) / lag(.) * 100,  
-                .names = "PctChange_{col}"))
+library(dplyr)
 
-
-overall_change <- overall_change %>%
-  mutate(across(starts_with("PctChange_"), ~ replace_na(., 0)))
-
-
-overall_change <- overall_change %>%
-  rowwise() %>%
-  mutate(TotalPctChange = sum(abs(as.numeric(c_across(starts_with("PctChange_")))), na.rm = TRUE)) %>%
+# Assuming your data is named 'team_rushing_data'
+# Step 1: Group by Team and arrange by Year to calculate year-over-year percentage change
+team_rushing_changes <- team_rushing_trends %>%
+  group_by(TeamFull) %>%
+  arrange(Year) %>%  # Ensure the data is arranged by year within each team
+  mutate(
+    PctChange_RushingPct = (run_percentage - lag(run_percentage)) / lag(run_percentage) * 100
+  ) %>%
   ungroup()
 
+# Step 2: Replace any NA values in the percentage change with 0 (e.g., for the first year or where no lag exists)
+team_rushing_changes <- team_rushing_changes %>%
+  mutate(PctChange_RushingPct = replace_na(PctChange_RushingPct, 0))
 
-print(head(overall_change))
+# Step 3: Print the results to check the year-over-year percentage changes
+print(head(team_rushing_changes))
+
+
+
+```
+```{r}
+library(tidyr)
+
+team_rushing_wide <- team_rushing_changes %>%
+  select(-run_percentage) %>%  # Remove the 'run_percentage' column
+  pivot_wider(
+    names_from = Year,                  # Use 'Year' as the new column names
+    values_from = PctChange_RushingPct   # The values will come from the year-over-year percentage change
+  ) %>%
+  select(-`2011`) %>%  # Remove the 2011 column as it will be NA
+  mutate(TotalPctChange = rowSums(across(starts_with("20")), na.rm = TRUE))  # Calculate the total percentage change
+
+# Step 2: Print the result with totals
+print(head(team_rushing_wide))
 
 
 ```
 
+
 ```{r}
-top_five <- overall_change |>
-  arrange(desc(TotalPctChange))|>
-  mutate(Top5 = ifelse(row_number() <= 5, "Top 5", "Not Top 5"))
+top_ten <- team_rushing_wide %>%
+  arrange(desc(TotalPctChange)) %>%
+  head(10)
 ```
 
 
 ```{r}
-top_changers <- top_five %>%
-  filter(Top5 == "Top 5")
+top_changers <- top_changers %>%
+  filter(!is.na(TotalPctChange) & !is.na(TeamFull))
 
+print(top_changers)
 
-ggplot(top_changers, aes(x = reorder(TeamFull, -TotalPctChange), y = TotalPctChange)) +
-  geom_bar(stat = "identity", fill = "steelblue") +
-  labs(title = "Top 5 Teams with Greatest Rushing Percentage Change",
+# Generate the bar plot
+ggplot(top_ten, aes(x =reorder (TeamFull, TotalPctChange), weight=TotalPctChange)) +
+  geom_bar()+
+  labs(title = "Top 10 Teams with Greatest Rushing Percentage Change since 2011",
        x = "Team",
        y = "Total Percentage Change") +
   theme_minimal() +
-  coord_flip()  # Flip coordinates for better readability if team names are long
+  coord_flip()  # Flip coordinates for better readability
 ```
+Circling back to what we know from earlier, the Pac-12 conference has been the heaviest throwing conference in recent history. With that being said, it's unbelievable the top 2 teams that have run the most in this span actually come from within the conference.
+
+Also, if you look down just a bit, the former Pac-12 Arizona State Sun Devils also crack the top 6. Although the majority of teams in this conference have passed in the past decade. These 3 schools have widely deviated from their peers.
+
+Let's put this into perspective with the rest of the conferences and how rushing trends have changed over time.
 `
-Not a surprise that Army has seen the greatest percentage change in rushing percentage since 2011. The fact that it's over 800 percent is ridiculous! If we exclude Army and Navy, WVU, Washington State and Akron have seen the greatest increase in rushing percentage since 2011. West Virginia being up this high surprises me. I know they've had some decent QB play over the years with Will Grier, but to see them shape this new identity surprises me. 
+```{r}
+# Calculate average rushing percentage by Conference and Year
+rushing_trends <- Stats |>
+  mutate(Year = year(ymd(Date)),
+         RushingPct = RushingAtt / (PassingAtt + RushingAtt) * 100) |>
+  group_by(Conference, Year) |>
+  summarise(avg_rushing_pct = mean(RushingPct, na.rm = TRUE))
 
-As we saw earlier, The Pac-12 has been the best conference when it comes to passing metrics. However, Washington State sneaks its way into the top teams that have run the ball more in this time. I could study more how effective these top teams have been in the win columns compared to some of their peers.
+# Calculate overall average rushing percentage across all conferences by year
+average_rushing <- rushing_trends |>
+  group_by(Year) |>
+  summarise(mean_rushing_pct = mean(avg_rushing_pct, na.rm = TRUE))
 
-After experimenting with a lot of different things this week, I've made some really good discoveries. The fact that the Big Ten Conference has been one of the worst in terms of passing metrics is shocking to me. Also, discovering WVU and Washington State as teams who have become run-heavy in the past 13 years is good to work with because they come from conferences that have been great statistically passing. 
+# Plot the data
+ggplot() + 
+  geom_line(data = rushing_trends, aes(x = Year, y = avg_rushing_pct, group = Conference), color = "grey") +  # Grey background for all conferences
+  geom_line(data = filter(rushing_trends, Conference == "Pac-12 Conference"), aes(x = Year, y = avg_rushing_pct), color = "red") +  # Highlight Pac-12 in red
+  
+  geom_line(data = average_rushing, aes(x = Year, y = mean_rushing_pct), color = "black") +  # Add average rushing percentage in black
+  labs(title = "Pac-12 reveals as one of the lowest rushing conferences",
+       x = "Year",
+       y = "Average Rushing Percentage") +
+  scale_y_continuous(limits = c(0, 80)) +  # Adjust y-axis limits if needed
+  theme_minimal()
 
-Next week will require more refining and answering a few more questions with my current data. I can look more at differentials for the best passing teams, and the best running teams. This way, I'll get a more clear understanding of how these run-heavy teams have faired compared to the aerial attackers.
+```
+
+When compared to all other conferences, the Pac-12 runs less than most. Despite this fact, and the massive drop off between 2017 and 2020, the top-two teams with the greatest percentage change in rushing percentage in the last 10 years are Washington State and Oregon State.
+
+As indicated with the median average black line, The Pac-12 has never even been average overall in terms of rushing percentage. It's unreal that 3 teams from the conference saw the greatest increase in rushing since 2011.
+
+
+let's keep exploring this.
+
+```{r}
+# Filter for Pac-12 teams
+pac12_trends <- Stats %>%
+  filter(Conference == "Pac-12 Conference") %>%
+  mutate(Year = year(ymd(Date)),
+         RushingPct = RushingAtt / (PassingAtt + RushingAtt) * 100) %>%
+  group_by(TeamFull, Year) %>%
+  summarise(avg_rushing_pct = mean(RushingPct, na.rm = TRUE))
+
+# Faceted line chart for each team
+ggplot(pac12_trends, aes(x = Year, y = avg_rushing_pct, color = TeamFull)) +
+  geom_line(size = 1) +
+  facet_wrap(~ TeamFull, scales = "free_y") +  # Create a separate plot for each team
+  labs(title = "Rushing Percentage Over Time by Pac-12 Teams",
+       x = "Year", y = "Average Rushing Percentage") +
+   scale_y_continuous(limits = c(25, 80))+
+  theme_minimal() +
+  theme(legend.position = "none")  # Remove the legend as it’s redundant with facets
+
+   
+
+```
+
+
+
+
+

@@ -1,4 +1,5 @@
 
+
 ```{r}
 library(tidyverse)
 library(ggplot2)
@@ -164,6 +165,7 @@ Here I decided to look at Rushing percentage trends over time. I knew that given
 Once I calculated percentage change, I was shocked by the results.
 
 ```{r}
+
 library(dplyr)
 
 # Step 1: Calculate the year-over-year percentage change for each team
@@ -177,30 +179,30 @@ percentage_change <- team_rushing_trends %>%
 print(head(percentage_change))
 
 
+percentage_change <- team_rushing_trends |>
+  mutate(across(starts_with("20"), ~ (. - lag(.)) / lag(.) * 100, .names = "PctChange_{col}"))
+ 
+
 ```
 
 
 
 
 ```{r}
-library(tidyr)
-
 library(dplyr)
-library(tidyr)
 
-library(tidyr)
+# Step 1: Calculate the year-over-year percentage change for each team
+percentage_change <- team_rushing_trends %>%
+  group_by(TeamFull) %>%  # Group by each team
+  arrange(TeamFull, Year) %>%  # Ensure data is ordered by team and year
+  mutate(PctChange_RushingPct = (run_percentage - lag(run_percentage)) / lag(run_percentage) * 100) %>%
+  ungroup()  # Remove grouping after calculation
 
-team_rushing_wide <- percentage_change %>%
-  select(-run_percentage) %>%  # Remove the 'run_percentage' column
-  pivot_wider(
-    names_from = Year,                  # Use 'Year' as the new column names
-    values_from = PctChange_RushingPct   # The values will come from the year-over-year percentage change
-  ) %>%
-  select(-`2011`) %>%  # Remove the 2011 column as it will be NA
-  mutate(TotalPctChange = rowSums(across(starts_with("20")), na.rm = TRUE))  # Calculate the total percentage change
+# Step 2: Display the results
+print(head(percentage_change))
 
-# Step 2: Print the result with totals
-print(head(team_rushing_wide))
+
+
 
 
 
@@ -312,4 +314,8 @@ The Pac-12 has proven in my presentation to be a dominant conference when it com
 
 Overall, a study focused on running correlating to winning took a wild turn. I think it was pretty obvious to those who watch football that the Pac-12 has always had good QBs and been pass heavy. However, I had no idea that 3 of the teams in the top 10 greatest increases over the 13 year period would be from the same conference.
 
+<<<<<<< HEAD
 While I did not find directly how running the ball translates to wins, I have discovered that some teams were bold enough to differ from the norm in their pass heavy conference. That says a lot about the commitments and structures of those programs. When you look at the standings overall, there is evidence of success.
+
+While I did not find directly how running the ball translates to wins, I have discovered that some teams were bold enough to differ from the norm in their pass heavy conference. That says a lot about the commitments and structures of those programs. When you look at the standings overall, there is evidence of success.
+
