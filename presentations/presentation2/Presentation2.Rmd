@@ -1,0 +1,49 @@
+```{r}
+library(tidyverse)
+```
+
+```{r}
+logs <- read_csv("https://thescoop.org/sports-data-files/cbblogs1525.csv")
+```
+
+This is the pbp data for men's basketball since 2015 through now. I load this data because I want to explore Maryland shooting 3 pointers in this time frame and compare it to teams around the country. I want to see if I can discover a baseline 3PT success rate that is consistent for teams that finish with at least a certain  amount of wins.
+
+```{r}
+maryland_data <- logs |> filter(Team == "Maryland")
+```
+```{r}
+three_point_summary <- maryland_data |>
+  summarise(
+    avg_3PM = mean(Team3P, na.rm = TRUE),   
+    avg_3PA = mean(Team3PA, na.rm = TRUE),   
+    avg_3P_percent = mean(Team3P / Team3PA, na.rm = TRUE) * 100 
+  )
+
+print(three_point_summary)
+```
+Since 2015, Maryland's averaged 3 PM per game is just over 7, shooting at around 34.1. Honestly, that percentage is a little higher than I thought so let's see who has been the best in college basketball over the years.
+
+
+
+```{r}
+maryland_data <- maryland_data %>%
+  mutate(Maryland_Win = ifelse(TeamScore > OpponentScore, 1, 0))
+
+# Check the updated dataset
+head(maryland_data)
+```
+```{r}
+win_rate <- maryland_data |>
+  group_by(Team3P, W_L, Team3PPCT) |>
+  summarise(
+    games_played = n(),
+    win_rate = mean(W_L, na.rm = TRUE)
+  )
+```
+
+So far we have a win_rate log which reveals wins and losses comparative to how many 3s Maryland made in the game and the pct which they shot. I'm trying to study what the average is and then I'll eventually compare that to the rest of NCAA and tournament teams.
+
+My biggest question right now is how can I make this data better for the viewer? Am I able to run correlation tests that reveal anything? Also, how can I visualize Maryland compared to other teams? Should I do it by conference, or should I study teams that have made the tournament at least 3 times since 2015?
+```
+
+

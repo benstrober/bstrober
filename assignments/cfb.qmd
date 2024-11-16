@@ -76,13 +76,6 @@ attendance <- read_csv('https://dwillis.github.io/sports-data-files/attendance.c
 ```
 
 
-```{r}
-top 10 <- attendance |>
-attendance |> 
-  arrange(desc(`2023`)) |> 
-  top_n(10) |> 
-  select(Institution, `2023`)
-```
 
 ```{r}
 ggplot() + 

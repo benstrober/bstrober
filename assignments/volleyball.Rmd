@@ -267,3 +267,17 @@ ggplot() +
   theme_minimal()
 ```
 
+
+```{r}
+rosters1 <- read_csv("https://thescoop.org/sports-data-files/rosters.csv")
+team_stats <- read_csv("https://thescoop.org/sports-data-files/team_stats.csv")
+teams_with_ids <- read_csv("https://thescoop.org/sports-data-files/teams_with_ids.csv")
+
+
+
+rosters_with_team_stats <- rosters1 |>
+  inner_join(team_stats, join_by(ncaa_id))
+
+
+```
+
