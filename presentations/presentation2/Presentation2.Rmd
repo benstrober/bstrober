@@ -1,5 +1,6 @@
 ```{r}
 library(tidyverse)
+library(lubridate)
 ```
 
 ```{r}
@@ -9,28 +10,156 @@ logs <- read_csv("https://thescoop.org/sports-data-files/cbblogs1525.csv")
 This is the pbp data for men's basketball since 2015 through now. I load this data because I want to explore Maryland shooting 3 pointers in this time frame and compare it to teams around the country. I want to see if I can discover a baseline 3PT success rate that is consistent for teams that finish with at least a certain  amount of wins.
 
 ```{r}
-maryland_data <- logs |> filter(Team == "Maryland")
-```
-```{r}
-three_point_summary <- maryland_data |>
-  summarise(
-    avg_3PM = mean(Team3P, na.rm = TRUE),   
-    avg_3PA = mean(Team3PA, na.rm = TRUE),   
-    avg_3P_percent = mean(Team3P / Team3PA, na.rm = TRUE) * 100 
+trept_ncaa <- logs |>
+  select(Team, Season, Conference, Team3P, Team3PA, Team3PPCT, TeamScore, OpponentScore, W_L) |>
+  mutate(
+    win = ifelse(grepl("W", W_L), 1, 0),  
+    differential = TeamScore - OpponentScore  
   )
 
-print(three_point_summary)
+
+head(threept_ncaa)
+```
+
+```{r}
+winlosslogs <- logs |> 
+ 
+  mutate(winloss = case_when(
+    grepl("W", W_L) ~ 1, 
+    grepl("L", W_L) ~ 0)
+) 
+```
+
+```{r}
+wins <- winlosslogs |> group_by(Season, Team) |> summarise(wins = sum(winloss), Team3PCT = sum(Team3P)/sum(Team3PA) *100)
+```
+```{r}
+confwins <- winlosslogs |> group_by(Season, Conference) |> summarise(wins = sum(winloss), Team3PCT = sum(Team3P)/sum(Team3PA) *100)
+```
+```{r}
+correlations <- winlosslogs |> 
+  mutate(
+    differential = TeamScore - OpponentScore
+    )
+```
+
+
+```{r}
+correlations |>  filter(!is.na(Team3PPCT), !is.na(differential))|> summarise(correlation = cor(differential, Team3PPCT, method="pearson"))
+```
+There is some correlation for 3Pt Pct compared to differential.
+
+```{r}
+correlations |>  filter(!is.na(Team3P), !is.na(differential))|> summarise(correlation = cor(differential, Team3P, method="pearson"))
+```
+Similar to 3Pt percentage, some correlation to wins, not insanely strong.
+
+```{r}
+correlations |>  filter(!is.na(Team3PA), !is.na(differential))|> summarise(correlation = cor(differential, Team3PA, method="pearson"))
+```
+You can take a lot of threes, but you need to make them to win. Pretty self explanatory.
+
+```{r}
+three_wins <- winlosslogs |> filter (Season != "2024-25")|>
+  group_by(Team) |> 
+  summarise(
+    wins = sum(winloss),
+    games = n(),
+    makes = sum(Team3P),
+    makes_game = makes/games) |> na.omit()
+```
+
+```{r}
+ggplot() + geom_point(data=  three_wins, aes(x=makes_game, y=wins))+
+   geom_smooth(data=three_wins, aes(x=makes_game, y=wins), method="lm")
+```
+```{r}
+fit <- lm(differential ~ Team3P, data = correlations)
+summary(fit)
+```
+```{r}
+fit <- lm(differential ~ Team3PPCT, data = correlations)
+summary(fit)
+```
+Same results on this regression model. 13% is some, but not enough to say it's definitive.
+
+
+
+
+```{r}
+
+maryland_data <- threept_ncaa |> filter(Team == "Maryland")
+
+
+maryland_trends <- maryland_data |>
+  group_by(Season) |>
+  summarise(
+    total_3PM = sum(Team3P, na.rm = TRUE),
+    total_3PA = sum(Team3PA, na.rm = TRUE),
+    avg_3P_percent = mean(Team3PPCT, na.rm = TRUE),
+    total_wins = sum(win, na.rm = TRUE),
+    avg_differential = mean(differential, na.rm = TRUE)
+  )
+
+# Check Maryland trends
+print(maryland_trends)
+
 ```
 Since 2015, Maryland's averaged 3 PM per game is just over 7, shooting at around 34.1. Honestly, that percentage is a little higher than I thought so let's see who has been the best in college basketball over the years.
 
+Let's find correlations for Maryland as a 3pt shooting team.
+
+```{r}
+mdcorrelations <- maryland_data |> 
+  mutate(
+    differential = TeamScore - OpponentScore
+    )
+
+mdcorrelations |>  filter(!is.na(Team3PPCT), !is.na(differential))|> summarise(correlation = cor(differential, Team3PPCT, method="pearson"))
+
+```
+There is about a 10% difference between Maryland and the rest of NCAA in terms of 3PPCT leading correlating to wins.
 
 
 ```{r}
-maryland_data <- maryland_data %>%
+mdcorrelations |>  filter(!is.na(Team3P), !is.na(differential))|> summarise(correlation = cor(differential, Team3P, method="pearson"))
+```
+For just 3 PT made, it's a 14% difference. Essentially, Maryland isn't a very good three point shooting team, so their 3PT ability doesn't coorelate as strongly with the differential compared to the rest of NCAA teams.
+
+Let's visualize it over the last 10 years, excluding 2024-2025.
+
+
+```{r}
+md_wins <- maryland_data |> filter (Season != "2024-25")|>
+ summarise(
+    wins = sum(win),
+    games = n(),
+    makes = sum(Team3P),
+    makes_game = makes/games) |> na.omit()
+```
+
+```{r}
+ncaa_averages <- threept_ncaa |>
+  group_by(Season) |>
+  summarise(
+    avg_ncaa_3PM = mean(Team3P, na.rm = TRUE),
+    avg_ncaa_3PA = mean(Team3PA, na.rm = TRUE),
+    avg_ncaa_3P_percent = mean(Team3PPCT, na.rm = TRUE)
+  )
+
+maryland_vs_ncaa <- maryland_trends |>
+  left_join(ncaa_averages, by = "Season")
+
+
+print(maryland_vs_ncaa)
+```
+
+It appears voer the years the average 3 PTM per game in NCAA is around 7-8. Maryland has been pretty consistently average compared to the rest of the NCAA. They haven't necessarily been good, but not the worst. Does Maryland maybe take too many threes? Have to run more tests to figure out exactly Maryland isn't doing well offensively. 
+```{r}
+maryland_data <- maryland_data |>
   mutate(Maryland_Win = ifelse(TeamScore > OpponentScore, 1, 0))
 
-# Check the updated dataset
-head(maryland_data)
+
 ```
 ```{r}
 win_rate <- maryland_data |>
@@ -44,6 +173,218 @@ win_rate <- maryland_data |>
 So far we have a win_rate log which reveals wins and losses comparative to how many 3s Maryland made in the game and the pct which they shot. I'm trying to study what the average is and then I'll eventually compare that to the rest of NCAA and tournament teams.
 
 My biggest question right now is how can I make this data better for the viewer? Am I able to run correlation tests that reveal anything? Also, how can I visualize Maryland compared to other teams? Should I do it by conference, or should I study teams that have made the tournament at least 3 times since 2015?
+```{r}
+team_correlations <- winlosslogs |> 
+  mutate(Win = ifelse(TeamScore > OpponentScore, 1, 0)) |>
+  group_by(Team) |> 
+  summarise(
+    correlation_3P_wins = cor(Team3PPCT, Win, use = "complete.obs"),
+    correlation_3PM_wins = cor(Team3P, Win, use = "complete.obs"),
+    avg_3PPCT = mean(Team3PPCT, na.rm = TRUE),
+    avg_wins = sum(Win)
+  )
 ```
+```{r}
+conference_data <- winlosslogs |> 
+  filter(Conference == "Big Ten") |> 
+  group_by(Team, Season) |> 
+  summarise(
+    total_3PA = sum(Team3PA, na.rm = TRUE),
+    total_wins = sum(winloss),
+    total_3PM = sum(Team3P)
+  )
+```
+```{r}
+bigconference_data <- conference_data |>
+  group_by(Team)|>
+  summarise(
+    avg_3PA = mean(total_3PA, na.rm = TRUE),
+    avg_wins = mean (total_wins),
+    avg_3PM = mean (total_3PM))
+```
+```{r}
+ggplot(bigconference_data, aes(x = avg_3PM, y = avg_wins, label = Team)) +
+  geom_point() +
+  geom_text(vjust = -0.5) +
+  labs(
+    title = "Iowa's 3 dominance allows overall dominance",
+    x = "Average 3PM",
+    y = "Wins per year average"
+  ) +
+  geom_point(data = subset(bigconference_data, Team == "Maryland"), 
+             color = "red", size = 3)
+
+
+```
+Maryland is about average when it comes to Big Ten teams in terms of shooting 3 pointers. Based on the Big Ten data, Iowa really stands out in this data because they've shot the highest 3 point clip and also won on average the most games per year. Illinois and Purdue are slightly better shooting the three than Maryland, but the win total is higher likely because of the phenomenal play from bigs. Iowa is honestly an outlier in this data, but it does reveal that if you're really efficent shooting the three, you will be good.It's also surprising how low Rutgers and Indiana fall in this data.
+```{r}
+
+threept_ncaa <- maryland_data |>
+  mutate(Maryland_Win = ifelse(TeamScore > OpponentScore & Team == "Maryland", 1, 0))
+
+```
+
+```{r}
+maryland_trends <- maryland_data |> 
+  group_by(Season) |> 
+  summarise(
+    avg_3PPCT = mean(Team3PPCT*100, na.rm = TRUE),
+    avg_3PM = mean(Team3P),
+    avg_3PA = mean(Team3PA),
+    
+    total_wins = sum(Maryland_Win))
+  
+```
+
+
+```{r}
+# Trends for Maryland's 3PA and 3PM
+maryland_trends_long <- maryland_trends |>
+  pivot_longer(cols = c(avg_3PM, avg_3PA), names_to = "Metric", values_to = "Value")
+
+ggplot(maryland_trends_long, aes(x = Season, y = Value, color = Metric)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  scale_color_manual(values = c("avg_3PM" = "red", "total_3PA" = "green"),
+                     labels = c("3PM", "3PA")) +
+  labs(
+    title = "Maryland: Total 3PM and 3PA Over Time",
+    x = "Season",
+    y = "Total",
+    color = "Metric"
+  ) +
+  theme_minimal()
+
+```
+```{r}
+ggplot(maryland_trends, aes(x = Season, y = avg_3PM)) +
+  geom_bar(stat = "identity", fill = "blue") +
+  labs(
+    title = "Maryland Hasn't Touched Double Digits on Average",
+    x = "Season",
+    y = "Total 3PM"
+  ) +
+  theme_minimal()
+```
+
+
+
+`
+```{r}
+ggplot(ncaa_corr, aes(x = corr_3P_wins, y = corr_3PM_wins)) +
+  geom_point(color = "darkblue") +
+  geom_smooth(method = "lm", color = "red", linetype = "dashed") +
+  labs(
+    title = "Correlation Between 3P% and Wins for NCAA Teams",
+    x = "Correlation (3P% vs Wins)",
+    y = "Correlation (3PM vs Wins)"
+  ) +
+  theme_minimal()
+
+
+```
+
+
+  
+```{r}
+# Top teams by average 3P% (filtering to meaningful data points)
+top_3P_teams <- trept_ncaa |>
+  group_by(Team) |>
+  summarise(
+    avg_3P_percent = mean(Team3PPCT, na.rm = TRUE) * 100,
+    avg_3PM = mean(Team3P, na.rm = TRUE),
+    total_wins = sum(win, na.rm = TRUE)
+  ) |>
+  arrange(desc(avg_3P_percent)) |>
+  head(10)
+
+
+ggplot(top_3P_teams, aes(x = reorder(Team, -avg_3P_percent), y = avg_3P_percent)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  geom_text(aes(label = round(avg_3P_percent, 1)), vjust = -0.5, size = 3) +
+  labs(
+    title = "Top 10 Teams by 3P% (All Seasons)",
+    x = "Team",
+    y = "Average 3P%"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+Pretty interesting stuff here. Some mid majors in this list and maybe that makes a lot of sense because they lack elite big man talent compared to Power conference schools. Michigan State though! They've been pretty consistent in terms of Big Ten teams that make postseason runs. Let's see what else we can be find.
+
+
+```
+
+
+```{r}
+
+ncaa_averages <- logs |>
+  group_by(Season) |>
+  summarise(
+    avg_ncaa_3PM = mean(Team3P, na.rm = TRUE),
+    avg_ncaa_3PA = mean(Team3PA, na.rm = TRUE),
+    avg_ncaa_3P_percent = mean(Team3PPCT, na.rm = TRUE)
+  )
+
+
+maryland_vs_ncaa <- maryland_trends |>
+  left_join(ncaa_averages, by = "Season")
+
+
+ggplot(maryland_vs_ncaa, aes(x = Season)) +
+  geom_line(aes(y = avg_3PM, color = "Maryland"), size = 1) +
+  geom_line(aes(y = avg_ncaa_3PM, color = "NCAA Average"), linetype = "dashed", size = 1) +
+  labs(title = "Maryland vs NCAA: avg 3PM Over Time", x = "Season", y = "3PM") +
+  scale_color_manual(values = c("Maryland" = "blue", "NCAA Average" = "red")) +
+  theme_minimal()
+
+
+### NOT DISPLAYING THE GRAPHS
+```
+
+
+
+
+
+```{r}
+
+maryland_long <- maryland_trends |>
+  pivot_longer(cols = c(avg_3PM, avg_3PA), names_to = "Metric", values_to = "Value")
+
+ggplot(maryland_long, aes(x = Season, y = Value, color = Metric)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(title = "Is Maryland taking too many threes?", x = "Season", y = "Count", color = "Metric") +
+  theme_minimal()
+```
+```{r}
+
+ggplot() +
+
+  geom_point(data = ncaa_averages, aes(x = Season, y = avg_ncaa_3P_percent), size = 3, color = "blue", alpha = 0.7) +
+  
+  geom_point(data = maryland_trends, aes(x = Season, y = avg_3PPCT), size = 3, color = "red", alpha = 0.7) +
+  
+  labs(
+    title = "NCAA vs Maryland: 3P% Across Seasons",
+    x = "Season",
+    y = "3P%",
+    color = "Legend"
+  ) +
+  theme_minimal()
+
+### tRYING TO FIGURE OUT WHY THIS IN'T RUNNING HOWI HOPED.
+
+```
+
+R STUDIO IS NOT ALLOWING THIS CODE TO RUN!!! It won't give me a button to run it despite restarting.
+
+
+
+
+
+  
 
 
