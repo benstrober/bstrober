@@ -1,10 +1,13 @@
 ```{r}
 library(tidyverse)
 library(lubridate)
+library(ggrepel)
+library (ggalt)
 ```
 
 ```{r}
 logs <- read_csv("https://thescoop.org/sports-data-files/cbblogs1525.csv")
+logs <- logs |> mutate(Win = ifelse(TeamScore > OpponentScore, 1, 0))
 ```
 
 This is the pbp data for men's basketball since 2015 through now. I load this data because I want to explore Maryland shooting 3 pointers in this time frame and compare it to teams around the country. I want to see if I can discover a baseline 3PT success rate that is consistent for teams that finish with at least a certain  amount of wins.
@@ -47,7 +50,7 @@ correlations <- winlosslogs |>
 ```{r}
 correlations |>  filter(!is.na(Team3PPCT), !is.na(differential))|> summarise(correlation = cor(differential, Team3PPCT, method="pearson"))
 ```
-There is some correlation for 3Pt Pct compared to differential.
+There is some correlation for 3Pt Pct compared to differential. It's not a riduclous amount, but we can continue testing and add Maryland into this equation.
 
 ```{r}
 correlations |>  filter(!is.na(Team3P), !is.na(differential))|> summarise(correlation = cor(differential, Team3P, method="pearson"))
@@ -81,7 +84,7 @@ summary(fit)
 fit <- lm(differential ~ Team3PPCT, data = correlations)
 summary(fit)
 ```
-Same results on this regression model. 13% is some, but not enough to say it's definitive.
+Same results on this regression model. 13% is some, but not enough to say it's definitive. We have to test using Maryland and others now.
 
 
 
@@ -170,9 +173,6 @@ win_rate <- maryland_data |>
   )
 ```
 
-So far we have a win_rate log which reveals wins and losses comparative to how many 3s Maryland made in the game and the pct which they shot. I'm trying to study what the average is and then I'll eventually compare that to the rest of NCAA and tournament teams.
-
-My biggest question right now is how can I make this data better for the viewer? Am I able to run correlation tests that reveal anything? Also, how can I visualize Maryland compared to other teams? Should I do it by conference, or should I study teams that have made the tournament at least 3 times since 2015?
 ```{r}
 team_correlations <- winlosslogs |> 
   mutate(Win = ifelse(TeamScore > OpponentScore, 1, 0)) |>
@@ -217,6 +217,8 @@ ggplot(bigconference_data, aes(x = avg_3PM, y = avg_wins, label = Team)) +
 
 ```
 Maryland is about average when it comes to Big Ten teams in terms of shooting 3 pointers. Based on the Big Ten data, Iowa really stands out in this data because they've shot the highest 3 point clip and also won on average the most games per year. Illinois and Purdue are slightly better shooting the three than Maryland, but the win total is higher likely because of the phenomenal play from bigs. Iowa is honestly an outlier in this data, but it does reveal that if you're really efficent shooting the three, you will be good.It's also surprising how low Rutgers and Indiana fall in this data.
+
+Circling back to my point earlier, Maryland finds itself close to the middle compared to other Big Ten teams when shooting the three. Maryland has typically won a decent amount of games since joining the conference, so down years shooting the three haven't neccesarily led to down years period except for 2023. If Maryland does shoot the three well, they typically find themselves toward the top.
 ```{r}
 
 threept_ncaa <- maryland_data |>
@@ -256,6 +258,7 @@ ggplot(maryland_trends_long, aes(x = Season, y = Value, color = Metric)) +
   theme_minimal()
 
 ```
+Maryland has been pretty consistent with the amount of threes it has taken over the years. In years where they were better teams overall, such as 2019, they typically took more threes. Maryland has been pretty consistently between 6-8 threes made per game.
 ```{r}
 ggplot(maryland_trends, aes(x = Season, y = avg_3PM)) +
   geom_bar(stat = "identity", fill = "blue") +
@@ -267,7 +270,7 @@ ggplot(maryland_trends, aes(x = Season, y = avg_3PM)) +
   theme_minimal()
 ```
 
-
+Maryland has peaked at around 8 3PM made per game in a season. For the most part Maryland has been right around average compared to other teams in NCAA. How does this translate to wins for everyone involved.
 
 `
 ```{r}
@@ -281,6 +284,7 @@ ggplot(ncaa_corr, aes(x = corr_3P_wins, y = corr_3PM_wins)) +
   ) +
   theme_minimal()
 
+##Need to add Maryland to this to reveal they are average
 
 ```
 
@@ -314,37 +318,36 @@ ggplot(top_3P_teams, aes(x = reorder(Team, -avg_3P_percent), y = avg_3P_percent)
 
 Pretty interesting stuff here. Some mid majors in this list and maybe that makes a lot of sense because they lack elite big man talent compared to Power conference schools. Michigan State though! They've been pretty consistent in terms of Big Ten teams that make postseason runs. Let's see what else we can be find.
 
+It's not that uncommon for mid major teams to rely heavily on the three point shot for success. When discussing Maryland, how can we see how they compare to the rest of NCAA on average?
 
-```
+
+
 
 
 ```{r}
 
-ncaa_averages <- logs |>
-  group_by(Season) |>
-  summarise(
-    avg_ncaa_3PM = mean(Team3P, na.rm = TRUE),
-    avg_ncaa_3PA = mean(Team3PA, na.rm = TRUE),
-    avg_ncaa_3P_percent = mean(Team3PPCT, na.rm = TRUE)
+ggplot()+
+  geom_dumbbell(
+    data=maryland_vs_ncaa,aes (y=Season, x=avg_3PM, xend=avg_ncaa_3PM),
+    colour = "grey",
+    colour_x ="red",
+    colour_xend ="blue"
   )
 
 
-maryland_vs_ncaa <- maryland_trends |>
-  left_join(ncaa_averages, by = "Season")
 
 
-ggplot(maryland_vs_ncaa, aes(x = Season)) +
-  geom_line(aes(y = avg_3PM, color = "Maryland"), size = 1) +
-  geom_line(aes(y = avg_ncaa_3PM, color = "NCAA Average"), linetype = "dashed", size = 1) +
-  labs(title = "Maryland vs NCAA: avg 3PM Over Time", x = "Season", y = "3PM") +
-  scale_color_manual(values = c("Maryland" = "blue", "NCAA Average" = "red")) +
-  theme_minimal()
+
 
 
 ### NOT DISPLAYING THE GRAPHS
 ```
 
+In 4 of the five years that Maryland made the tournament, it was better than the NCAA average for three pointers made in a game. The only exception was 2022, Kevin Willard's first year as the head coach. This reveals Maryland actually typically performing below average as a three-point shooting team. In years where they have been really good, though, the three point success sees an uptick.
 
+Maryland's only sub .500 season came in 2023. We know that Maryland has typically won a fair amount of games. Despite being below average shooting threes, Maryland has found ways to overcome it to an extent. However, it has never really obtained elite status outside of 2019 when there wasn't a tournament.
+
+Since Maryland never seems to be incredible as a three-point shooting team, could it possibly be taking too many?
 
 
 
@@ -359,32 +362,230 @@ ggplot(maryland_long, aes(x = Season, y = Value, color = Metric)) +
   labs(title = "Is Maryland taking too many threes?", x = "Season", y = "Count", color = "Metric") +
   theme_minimal()
 ```
+### THINK I ACCIDENTALLY MADE THIS CHART TWICE
+
+Maryland has been pretty consistent with the amount of threes it has taken over the years. In years where they were better teams overall, such as 2019, they typically took more threes. Maryland has been pretty consistently between 6-8 threes made per game. 
+
+It's time to look at a broader context. Maryland has been about average shooting threes. How do teams who have gone deep into the tournament fair? Are they all great shooting teams?
+
 ```{r}
 
-ggplot() +
+elite_teams <- logs |>
+  filter(
+    Season == "2023-2024",
+    Team %in% c("NC State", "Alabama", "Purdue", "Clemson", "Illinois", "Duke", "Tennessee", "Connecticut")
+  ) |>
+  group_by(Team) |>
+  summarise(
+    avg_3PM = mean(Team3P, na.rm = TRUE),
+    avg_3PA = mean(Team3PA, na.rm = TRUE),
+    avg_3PPCT = mean(Team3PPCT, na.rm = TRUE),
+    total_wins = sum(ifelse(grepl("W", W_L), 1, 0))
+  )
 
-  geom_point(data = ncaa_averages, aes(x = Season, y = avg_ncaa_3P_percent), size = 3, color = "blue", alpha = 0.7) +
-  
-  geom_point(data = maryland_trends, aes(x = Season, y = avg_3PPCT), size = 3, color = "red", alpha = 0.7) +
-  
-  labs(
-    title = "NCAA vs Maryland: 3P% Across Seasons",
-    x = "Season",
-    y = "3P%",
-    color = "Legend"
-  ) +
-  theme_minimal()
+# Check the results
+print(elite_teams)
 
-### tRYING TO FIGURE OUT WHY THIS IN'T RUNNING HOWI HOPED.
+
 
 ```
 
-R STUDIO IS NOT ALLOWING THIS CODE TO RUN!!! It won't give me a button to run it despite restarting.
+Let's compare these teams to Maryland.
+
+```{r}
+terps2023 <- maryland_trends |> filter(Season == "2023-2024")
+
+print(elite_teams)
+print(maryland_summary)
+
+
+ggplot(elite_teams, aes(x = avg_3PM, y = total_wins)) +
+  geom_point(color = "blue") +
+  geom_point(data = terps2023, aes(x = avg_3PM, y = total_wins), color = "red", size = 3) +
+  labs(
+    title = "Maryland falls behind tournament teams",
+    x = "Average 3s Per Game",
+    y = "Wins"
+  ) +
+  theme_minimal()
+```
+Maryland was abysmal shooting the 3 in 2023-2024, and the wins suffered as a result. 7 of the 8 teams in the elite eight averaged at least 8 Three's made per game. NC State was the only team under 7, and they had a physically dominant game inside with DJ Burns. 
+
+That's just one sample. What about other years?
+
+```{r}
+
+twoelite_teams <- logs |>
+  filter(
+    Season == "2022-2023",
+    Team %in% c("Kansas State", "Florida Atlantic", "Connecticut", "Gonzaga", "Creighton", "Texas", "San Diego State", "Miami (FL)")
+  ) |>
+  group_by(Team) |>
+  summarise(
+    avg_3PM = mean(Team3P, na.rm = TRUE),
+    avg_3PA = mean(Team3PA, na.rm = TRUE),
+    avg_3PPCT = mean(Team3PPCT, na.rm = TRUE),
+    total_wins = sum(ifelse(grepl("W", W_L), 1, 0))
+  )
+terps2022 <- maryland_trends |> filter(Season == "2022-2023")
+
+print(twoelite_teams)
+print(maryland_summary)
+
+
+ggplot(twoelite_teams, aes(x = avg_3PM, y = total_wins)) +
+  geom_point(color = "blue") +
+  geom_point(data = terps2022, aes(x = avg_3PM, y = total_wins), color = "red", size = 3) +
+  labs(
+    title = "2022 Looks similar: Maryland behind the elite",
+    x = "Average 3s Per Game",
+    y = "Wins"
+  ) +
+  theme_minimal()
+
+```
+The previous year we can see a similar trend here for Maryland finds itself behind the teams in the elite 8, but not as much as 2023. More of the teams were between 7-8, as opposed to 8-9. From what we already know, Maryland was actually an NCAA tournament team this year. Despite that, Maryland fell in the round of 32 to Alabama, who eventually lost to San Diego State in the next round. Interestingly enough, the Aztecs were under 7 threes per game and made a run to the national championship.
+
+Let's try a test for 2015-16, a solid Maryland tournament year. I'd love to test out 2019-2020...But you know what happened that spring...
 
 
 
 
+
+
+
+```{r}
+threeelite_teams <- logs |>
+  filter(
+    Season == "2015-2016",
+    Team %in% c("Villanova", "Kansas", "Oklahoma", "Oregon", "North Carolina", "Notre Dame", "Syracuse", "Virginia")
+  ) |>
+  group_by(Team) |>
+  summarise(
+    avg_3PM = mean(Team3P, na.rm = TRUE),
+    avg_3PA = mean(Team3PA, na.rm = TRUE),
+    avg_3PPCT = mean(Team3PPCT, na.rm = TRUE),
+    total_wins = sum(ifelse(grepl("W", W_L), 1, 0))
+  )
+terps2015 <- maryland_trends |> filter(Season == "2015-2016")
+
+print(twoelite_teams)
+print(maryland_summary)
+
+
+ggplot(threeelite_teams, aes(x = avg_3PM, y = total_wins)) +
+  geom_point(color = "blue") +
+  geom_point(data = terps2015, aes(x = avg_3PM, y = total_wins), color = "red", size = 3) +
+  labs(
+    title = "Maryland had its stroke in 2015, but fell to a better Kansas team",
+    x = "Average 3s Per Game",
+    y = "Wins"
+  ) +
+  theme_minimal()
+
+```
+Here we have some interesting findings. Maryland actually shot fairly decently from three compared to teams in the elite eight this year. However, they fell just short to Kansas in the Sweet 16. Kansas, the number one seed in that tournament, averaged exactly 8 threes per game. North Carolina made a run to the national championship that season, and they actaully were under 6 threes made per game. On the other hand, Oklahoma, a final four team, made an astonishing 10+ threes on average.
+
+From what we've gathered through a lot of data is that Maryland is pretty average when it comes to shooting 3s. Some years they've been better, some worse. However, they've still found ways to win a decent amount. Let's see if Maryland should rely on its three point shooting ability.
+
+```{r}
+library(cluster)
+
+
+clustering_data <- logs |>
+  group_by(Team) |>
+  summarise(
+    avg_3PM = mean(Team3P, na.rm = TRUE),
+    avg_3PA = mean(Team3PA, na.rm = TRUE),
+    avg_3P_percent = mean(Team3PPCT, na.rm = TRUE),
+    total_wins = sum(ifelse(grepl("W", W_L), 1, 0))
+  ) |>
+  na.omit()
+
+
+
+set.seed(123)
+kmeans_result <- kmeans(clustering_data[, -1], centers = 4)
+
+
+clustering_data <- clustering_data |>
+  mutate(cluster = as.factor(kmeans_result$cluster))
+topclustered <- clustering_data |> filter(avg_3PM >8.5, total_wins >185)
+
+
+umd <- clustering_data %>% filter(Team == 'Maryland')
+
+ggplot(clustering_data, aes(x = avg_3PM, y = total_wins, color = cluster)) +
+  geom_point() +
+  geom_text(data = umd, aes(label = Team), color = "black", vjust = -0.9) +
+  geom_encircle( data = topclustered,aes(x = avg_3PM, y = total_wins), colour ="blue")+
+  labs(
+    title = "Maryland has shot simiarly to other teams and still won",
+    x = "Average 3's Per Game",
+    y = "Wins"
+  ) +
+  theme_minimal()
+```
+As revealed, Maryland is about average when it comes to threes in a game, yet it still finds itself in the upper echelon for the win totals.Maryland has found ways to win games without really ever being a dominant scoring team. When filtering to find the teams circled on the graph, it reveals schools such as Villanova, Alabama, Auburn, Winthrop, Creighton and Marquette. 
+
+How reliant are teams on shooting the three. Clearly, Maryland has won games without staggering numbers. Is this the case for other teams?
+
+```{r}
+ three_point_contribution |> summarise(
+   ptsavg = mean(total_points),
+   avgpctof3 = mean(pct_points_3P)
+ )
+```
+
+
+
+
+
+
+
+```{r}
+three_point_contribution <- logs |>
+  filter (Conference %in% c("Big Ten MBB", "SEC MBB", "ACC MBB", "Big East MBB", "Big 12 MBB")) %>% 
+  separate(Season, c("start","end"), sep='-') %>% 
+  group_by(Team) |>
+  summarise(
+    total_wins = sum(Win), 
+    games = n(),
+    win_pct = total_wins/games*100, 
+    total_points = sum(TeamScore, na.rm = TRUE),
+    points_from_3 = sum(Team3P * 3, na.rm = TRUE),
+    pct_points_3P = (points_from_3 / total_points) * 100
+  ) %>% 
+  filter(total_points > 15000)
+
+
+maryland_contribution <- three_point_contribution |>
+  filter(Team == "Maryland")
+
+
+ggplot() +
+#  geom_point(aes(group = Team), alpha = 0.5) +
+  geom_point(data=three_point_contribution, aes(x = total_points, y = pct_points_3P, size = win_pct), color = "grey") +
+  geom_point(data = maryland_contribution, aes(x = total_points, y = pct_points_3P, size = win_pct), color = "red") +
+  labs(
+    title = "Maryland Overcomes Subpar Scoring",
+    x = "Total Points",
+    y = "Percentage of Points from 3s"
+  ) +
+  geom_hline (yintercept = 30.1748)+
+  geom_vline (xintercept = 17713.08)+
+  theme_minimal()
+
+```
+
+Maryland is slightly below average compared to NCAA in scoring. As for percentage of points coming from three, Maryland is about average and this reveals Maryland isn't necessarily reliant on three-point shooting. However, if they are really awful from three, they probably will suffer. 2023 is a good example because in Maryland's worst 3 pt shooting year, the team had its only year with a losing record.
+
+Three point shooting isn't everything for teams in NCAA. Kentucky has a winning percentage of over 75 despite using the three pointer for under 25% of its points. Even without making a lot of threes, plenty of teams have found ways to be exciting and score in other ways to win. 
+
+Only four teams in NCAA are over 35% for percentage of points coming from threes. Overall, Maryland has been pretty average as an offensive basketball team, but the win total has changed the preception of the team. Even in great years for Maryland, the three-point shooting has never been other wordly compared to other NCAA teams. If the team finds other ways to win, people won't notice as much.
 
   
+  
+  ##Notes: Each chart that is meaningful add 2 sentences why they are meaningful. Put it together into narrative. What is it saying what is the takeaway. 
 
 
