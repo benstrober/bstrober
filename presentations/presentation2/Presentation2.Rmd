@@ -250,21 +250,25 @@ If Maryland was more consistent from three, it may have seen more success in som
 
 
 ```{r}
-ggplot()+
+ggplot() +
   geom_dumbbell(
-    data=maryland_vs_ncaa,aes (y=Season, x=avg_ncaa_3PM, xend=avg_3pm),
+    data = maryland_vs_ncaa,
+    aes(y = Season, x = avg_ncaa_3PM, xend = avg_3pm),
     colour = "grey",
-    colour_x ="blue",
-    colour_xend ="red"
+    colour_x = "blue",
+    colour_xend = "red"
+  ) +
+  labs(
+    title = "Below Average From 3 Is a Below Average Team"
   )
 ```
 In 4 of the five years that Maryland made the tournament, it was better than the NCAA average for three pointers made in a game. The only exception was 2022, Kevin Willard's first year as the head coach. This reveals Maryland typically performs below average as a three-point shooting team. In years where they have been really good, though, the three point success sees an uptick.
 
-Maryland's only sub .500 season came in 2023. We know that Maryland has typically won a fair amount of games. Despite being below average shooting threes, Maryland has found ways to overcome it to an extent. However, it has never really obtained elite status outside of 2019 when there wasn't a tournament.
+Maryland's only sub .500 season came in 2023.  Maryland has typically won a fair amount of games. Despite being below average shooting threes, Maryland has found ways to overcome it to an extent. However, it has never really obtained elite status outside of 2019 when there wasn't a tournament.
 
-Maryland has been pretty consistent with the amount of threes it has taken over the years. In years where they were better teams overall, such as 2019, they typically took more threes. Maryland has been pretty consistently between 6-8 threes made per game. 
+Maryland has been pretty consistent with the amount of threes it has taken over the years. In years where they were better teams overall, such as 2019, they typically took more threes. Maryland has been pretty consistently between 6-8 threes made per game. Although the team has done well in a good amount of years, them falling behind NCAA averages reveals lack of offensive output holds them back from being more dynamic.
 
-NCAA obviously has so many teams to pick through, and many of them have different strenghts. When all of them are clustered, where does Maryland end up?
+NCAA obviously has so many teams to pick through, and many of them have different strengths. When all of them are clustered, where does Maryland end up?
 
 
 ```{r}
