@@ -1,3 +1,4 @@
+
 ```{r}
 library(tidyverse)
 library(lubridate)
@@ -15,6 +16,13 @@ The data includes play-by-play statistics for NCAA men’s basketball from 2015 
 Although Maryland has found success over the years, this study indicates why their mediocrity offensively has held them back from taking the next step as a program.
 
 ```{r}
+logs <- read_csv("https://thescoop.org/sports-data-files/cbblogs1525.csv")
+winlosslogs <- logs |> mutate(Win = ifelse(TeamScore > OpponentScore, 1, 0))
+```
+
+
+
+```{r}
 trept_ncaa <- logs |>
   select(Team, Season, Conference, Team3P, Team3PA, Team3PPCT, TeamScore, OpponentScore, W_L) |>
   mutate(
@@ -23,7 +31,7 @@ trept_ncaa <- logs |>
   )
 
 
-head(threept_ncaa)
+head(trept_ncaa)
 
 
 
@@ -68,7 +76,7 @@ summary(fit)
 The model reveals about a 13% significance which furthers reveals the correlaton ins't insanely strong. With this information known, it becomes time to test Maryland other teams in NCAA to see how it stacks up.
 
 ```{r}
-maryland_data <- threept_ncaa |> filter(Team == "Maryland")
+maryland_data <- trept_ncaa |> filter(Team == "Maryland")
 
 
 maryland_trends <- maryland_data |>
@@ -105,7 +113,7 @@ md_wins <- maryland_data |> filter (Season != "2024-25")|>
     makes = sum(Team3P),
     makes_game = makes/games) |> na.omit()
 
-ncaa_averages <- threept_ncaa |>
+ncaa_averages <- trept_ncaa |>
   group_by(Season) |>
   summarise(
     avg_ncaa_3PM = mean(Team3P, na.rm = TRUE),
@@ -205,7 +213,7 @@ Through balance on the offensive end and utilizing defensive ability, Maryland h
 This offers the question: How does everyone else in NCAA compare.
 
 ```{r}
-ggplot(ncaa_corr, aes(x = corr_3P_wins, y = corr_3PM_wins)) +
+ggplot(team_correlations, aes(x = correlation_3P_wins, y = correlation_3PM_wins)) +
   geom_point(color = "darkblue") +
   geom_smooth(method = "lm", color = "red", linetype = "dashed") +
 
@@ -217,14 +225,14 @@ ggplot(ncaa_corr, aes(x = corr_3P_wins, y = corr_3PM_wins)) +
   theme_minimal()
 ```
 
-There's a lot to unpack from this. Where does Maryland stand amongst all these teams?
+There's a lot to unpack from this. Where does Maryland stand among all these teams?
 
 ```{r}
-ggplot(ncaa_corr, aes(x = corr_3P_wins, y = corr_3PM_wins)) +
+ggplot(team_correlations, aes(x = correlation_3P_wins, y = correlation_3PM_wins)) +
   geom_point(color = "darkblue") +
   geom_smooth(method = "lm", color = "red", linetype = "dashed") +
-  geom_point(data = ncaa_corr[ncaa_corr$Team == "Maryland", ],
-             aes(x = corr_3P_wins, y = corr_3PM_wins),
+  geom_point(data = team_correlations[team_correlations$Team == "Maryland", ],
+             aes(x = correlation_3PM_wins, y = correlation_3PM_wins),
              color = "red", size = 3) +
 
   labs(
@@ -405,12 +413,12 @@ Regardless of the result, it's clear Maryland's mediocre three-point shooting do
   
 
 ```{r}
-three_point_contribution <- logs |>
+three_point_contribution <- winlosslogs |>
   filter (Conference %in% c("Big Ten MBB", "SEC MBB", "ACC MBB", "Big East MBB", "Big 12 MBB")) %>% 
   separate(Season, c("start","end"), sep='-') %>% 
   group_by(Team) |>
   summarise(
-    total_wins = sum(Win), 
+    total_wins = sum(winloss), 
     games = n(),
     win_pct = total_wins/games*100, 
     total_points = sum(TeamScore, na.rm = TRUE),
